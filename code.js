@@ -2558,16 +2558,33 @@ console.log(
 );
 
 // ============================================================
-// FIRST UPDATE
+// GITHUB ACTIONS MODE
 // ============================================================
 
-updateGateSystem();
+if (process.env.GITHUB_ACTIONS === "true") {
+  updateGateSystem()
+    .then(() => {
+      console.log(
+        "\n[GITHUB ACTION] One monitoring cycle completed."
+      );
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error(
+        "\n[GITHUB ACTION] Monitor failed:",
+        error
+      );
+      process.exit(1);
+    });
+} else {
+  // ==========================================================
+  // LOCAL MODE
+  // ==========================================================
 
-// ============================================================
-// UPDATE EVERY MINUTE
-// ============================================================
+  updateGateSystem();
 
-setInterval(
-  updateGateSystem,
-  REFRESH_INTERVAL_MS
-);
+  setInterval(
+    updateGateSystem,
+    REFRESH_INTERVAL_MS
+  );
+}
