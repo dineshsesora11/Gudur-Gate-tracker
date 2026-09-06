@@ -42,7 +42,9 @@ try {
     "❌ Could not load Firebase service account."
   );
 
-  console.error(error.message);
+  console.error(
+    error.message
+  );
 
   process.exit(1);
 }
@@ -72,11 +74,15 @@ const RAILRADAR_BASE_URL =
   "https://api.railradar.in/v1";
 
 // ============================================================
-// GUDUR / GATE COORDINATES
+// GUDUR COORDINATES
 // ============================================================
 
 const GDR_LAT = 14.14842;
 const GDR_LNG = 79.84524;
+
+// ============================================================
+// GATE COORDINATES
+// ============================================================
 
 const CHENNAI_GATE_LAT = 14.1396639;
 const CHENNAI_GATE_LNG = 79.8441306;
@@ -88,34 +94,43 @@ const TIRUPATI_GATE_LNG = 79.8436000;
 // SETTINGS
 // ============================================================
 
-// Upcoming trains can be at most 150 km away.
+// Upcoming trains can be maximum 150 km away.
 const UPCOMING_MAX_DISTANCE_KM = 150;
 
 // IMPORTANT:
-// Never show an upcoming train more than 3 hours away.
-const UPCOMING_MAX_ETA_MINUTES = 180;
+// Allow trains up to 6 hours away in the upcoming list.
+const UPCOMING_MAX_ETA_MINUTES = 360;
 
-// Gate physically closes only when train is within
-// this distance of the corresponding crossing.
+// Physical gate closure distance.
 const GATE_STOP_DISTANCE_KM = 0.60;
 
-// GitHub Actions cannot run faster than every 5 minutes.
+// Local mode refresh.
 const REFRESH_INTERVAL_MS = 60000;
 
-// Default speed if RailRadar does not provide a usable speed.
+// Default speed if RailRadar does not provide speed.
 const DEFAULT_SPEED_KMPH = 55;
 
-// Never allow a calculated speed below this.
+// Minimum usable speed.
 const MIN_SPEED_KMPH = 5;
 
-// Station board request.
+// RailRadar station board.
 const STATION_BOARD_HOURS = 4;
 
-// Maximum trains from station board that we will verify.
-const MAX_BOARD_CANDIDATES = 22;
+// ============================================================
+// IMPORTANT CHANGE
+// ============================================================
+//
+// We DO NOT stop after only 7 trains anymore.
+//
+// The station board can return 16+ trains.
+//
+// We inspect all board trains for upcoming status.
+//
+// Live verification is limited separately.
+//
+// ============================================================
 
-// Maximum live train API calls per cycle.
-const MAX_LIVE_VERIFICATIONS = 7;
+const MAX_LIVE_VERIFICATIONS = 12;
 
 // ============================================================
 // KNOWN TIRUPATI CORRIDOR TRAINS
@@ -140,7 +155,7 @@ const TIRUPATI_CORRIDOR_TRAINS =
   ]);
 
 // ============================================================
-// TEXT HELPERS
+// TEXT NORMALIZER
 // ============================================================
 
 function normalizeText(value) {
@@ -151,23 +166,32 @@ function normalizeText(value) {
     .replace(/\s+/g, " ");
 }
 
-function containsAny(text, values) {
+// ============================================================
+// CONTAINS ANY
+// ============================================================
+
+function containsAny(
+  text,
+  values
+) {
   const normalized =
     normalizeText(text);
 
-  return values.some((value) =>
-    normalized.includes(
-      normalizeText(value)
-    )
+  return values.some(
+    (value) =>
+      normalized.includes(
+        normalizeText(value)
+      )
   );
 }
 
 // ============================================================
-// NUMBER HELPERS
+// NUMBER
 // ============================================================
 
 function toNumber(value) {
-  const n = Number(value);
+  const n =
+    Number(value);
 
   return Number.isFinite(n)
     ? n
@@ -175,7 +199,7 @@ function toNumber(value) {
 }
 
 // ============================================================
-// HAVERSINE DISTANCE
+// HAVERSINE
 // ============================================================
 
 function haversineKm(
@@ -184,10 +208,17 @@ function haversineKm(
   lat2,
   lng2
 ) {
-  const aLat = toNumber(lat1);
-  const aLng = toNumber(lng1);
-  const bLat = toNumber(lat2);
-  const bLng = toNumber(lng2);
+  const aLat =
+    toNumber(lat1);
+
+  const aLng =
+    toNumber(lng1);
+
+  const bLat =
+    toNumber(lat2);
+
+  const bLng =
+    toNumber(lng2);
 
   if (
     aLat === null ||
@@ -211,18 +242,28 @@ function haversineKm(
     180;
 
   const lat1Rad =
-    (aLat * Math.PI) /
+    (aLat *
+      Math.PI) /
     180;
 
   const lat2Rad =
-    (bLat * Math.PI) /
+    (bLat *
+      Math.PI) /
     180;
 
   const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1Rad) *
-      Math.cos(lat2Rad) *
-      Math.sin(dLng / 2) ** 2;
+    Math.sin(
+      dLat / 2
+    ) ** 2 +
+    Math.cos(
+      lat1Rad
+    ) *
+      Math.cos(
+        lat2Rad
+      ) *
+      Math.sin(
+        dLng / 2
+      ) ** 2;
 
   const c =
     2 *
@@ -235,10 +276,13 @@ function haversineKm(
 }
 
 // ============================================================
-// GET ORIGIN
+// ORIGIN
 // ============================================================
 
-function getOrigin(train, item) {
+function getOrigin(
+  train,
+  item
+) {
   return (
     train.origin ||
     train.source ||
@@ -256,7 +300,7 @@ function getOrigin(train, item) {
 }
 
 // ============================================================
-// GET DESTINATION
+// DESTINATION
 // ============================================================
 
 function getDestination(
@@ -276,10 +320,14 @@ function getDestination(
 }
 
 // ============================================================
-// ROUTE HELPERS
+// ROUTE
 // ============================================================
 
-function getRoute(train, live, item) {
+function getRoute(
+  train,
+  live,
+  item
+) {
   if (
     Array.isArray(
       train.route
@@ -308,20 +356,25 @@ function getRoute(train, live, item) {
 }
 
 // ============================================================
-// ROUTE STATION CODE
+// STATION CODE
 // ============================================================
 
-function getStationCode(stop) {
+function getStationCode(
+  stop
+) {
   return normalizeText(
     stop?.stationCode ||
       stop?.code ||
       stop?.station ||
       ""
-  ).replace(/ /g, "");
+  ).replace(
+    / /g,
+    ""
+  );
 }
 
 // ============================================================
-// FIND GUDUR SEQUENCE
+// GUDUR SEQUENCE
 // ============================================================
 
 function getGudurSequence(
@@ -336,12 +389,13 @@ function getGudurSequence(
       item
     );
 
-  for (const stop of route) {
-    const code =
-      getStationCode(stop);
-
+  for (
+    const stop of route
+  ) {
     if (
-      code === "GDR"
+      getStationCode(
+        stop
+      ) === "GDR"
     ) {
       const sequence =
         toNumber(
@@ -374,25 +428,13 @@ function getCurrentSequence(
     item.currentLocation ||
     {};
 
-  const sequence =
-    toNumber(
-      current.sequence
-    );
-
-  return sequence;
+  return toNumber(
+    current.sequence
+  );
 }
 
 // ============================================================
 // ROUTE DIRECTION
-// ============================================================
-//
-// This is used to determine which physical corridor
-// the train belongs to.
-//
-// It is NOT used to reject a train from gate closure.
-//
-// Both directions must close the corresponding gate.
-//
 // ============================================================
 
 function getRouteDirection(
@@ -406,13 +448,13 @@ function getRouteDirection(
     item.currentLocation ||
     {};
 
-  const currentStatus =
+  const status =
     normalizeText(
       current.status
     );
 
   if (
-    currentStatus.includes(
+    status.includes(
       "DEPART"
     )
   ) {
@@ -454,22 +496,33 @@ function getRouteDirection(
     return "AT_GUDUR";
   }
 
+  // ----------------------------------------------------------
+  // DESTINATION FALLBACK
+  // ----------------------------------------------------------
+
+  const destination =
+    getDestination(
+      train,
+      item
+    );
+
+  if (
+    containsAny(
+      destination,
+      [
+        "GUDUR",
+        "GDR"
+      ]
+    )
+  ) {
+    return "TOWARD_GUDUR";
+  }
+
   return "UNKNOWN";
 }
 
 // ============================================================
-// DETERMINE CORRIDOR FROM ROUTE
-// ============================================================
-//
-// MAS corridor:
-// Chennai side <-> Gudur
-//
-// TPTY corridor:
-// Tirupati side <-> Gudur
-//
-// We look at stations BEFORE Gudur in the actual route.
-// This is more reliable than using only train origin.
-//
+// CORRIDOR DETECTION
 // ============================================================
 
 function determinePhysicalCorridor(
@@ -494,7 +547,13 @@ function determinePhysicalCorridor(
   let lastSide =
     null;
 
-  for (const stop of route) {
+  // ----------------------------------------------------------
+  // ROUTE ANALYSIS
+  // ----------------------------------------------------------
+
+  for (
+    const stop of route
+  ) {
     const sequence =
       toNumber(
         stop.sequence
@@ -604,7 +663,41 @@ function determinePhysicalCorridor(
   }
 
   // ----------------------------------------------------------
-  // KNOWN TIRUPATI TRAIN FALLBACK
+  // DESTINATION FALLBACK
+  // ----------------------------------------------------------
+
+  const destination =
+    getDestination(
+      train,
+      item
+    );
+
+  if (
+    containsAny(
+      destination,
+      [
+        "TIRUPATI",
+        "TPTY"
+      ]
+    )
+  ) {
+    return "TPTY";
+  }
+
+  if (
+    containsAny(
+      destination,
+      [
+        "CHENNAI",
+        "MAS"
+      ]
+    )
+  ) {
+    return "MAS";
+  }
+
+  // ----------------------------------------------------------
+  // KNOWN TPTY TRAINS
   // ----------------------------------------------------------
 
   const trainNo =
@@ -626,13 +719,7 @@ function determinePhysicalCorridor(
 }
 
 // ============================================================
-// EXTRACT ACTUAL GPS POSITION
-// ============================================================
-//
-// ONLY actual position is allowed for physical gate closure.
-//
-// Route interpolation is deliberately NOT used here.
-//
+// ACTUAL GPS
 // ============================================================
 
 function extractActualGpsPosition(
@@ -685,12 +772,6 @@ function extractActualGpsPosition(
         current.speed
     );
 
-  const bearing =
-    toNumber(
-      current.bearingDegrees ??
-        current.bearing
-    );
-
   return {
     lat,
     lng,
@@ -698,24 +779,18 @@ function extractActualGpsPosition(
       speed !== null
         ? speed
         : null,
-    bearing:
-      bearing !== null
-        ? bearing
-        : null,
+
     source:
       current.positionSource ||
       "GPS",
-    isActualPosition: true
+
+    isActualPosition:
+      true
   };
 }
 
 // ============================================================
-// EXTRACT ACTUAL STATION POSITION
-// ============================================================
-//
-// RailRadar can return station-code based actual position.
-// When includeCoordinates=true, route stops contain coordinates.
-//
+// ACTUAL STATION POSITION
 // ============================================================
 
 function extractActualStationPosition(
@@ -756,7 +831,6 @@ function extractActualStationPosition(
   let matched =
     null;
 
-  // First match by sequence.
   if (
     currentSequence !== null
   ) {
@@ -770,7 +844,6 @@ function extractActualStationPosition(
       );
   }
 
-  // Then match by station code.
   if (
     !matched &&
     currentCode
@@ -780,7 +853,8 @@ function extractActualStationPosition(
         (stop) =>
           getStationCode(
             stop
-          ) === currentCode
+          ) ===
+          currentCode
       );
   }
 
@@ -818,21 +892,26 @@ function extractActualStationPosition(
   return {
     lat,
     lng,
+
     speedKmph:
       speed !== null
         ? speed
         : null,
-    bearing: null,
+
     source:
       "STATION_CODE",
+
     stationCode:
       currentCode,
+
     stationName:
       current.stationName ||
       matched.stationName ||
       matched.name ||
       "",
-    isActualPosition: true
+
+    isActualPosition:
+      true
   };
 }
 
@@ -864,7 +943,7 @@ function getActualPosition(
 }
 
 // ============================================================
-// GET ACTUAL DISTANCE TO GATE
+// GATE DISTANCES
 // ============================================================
 
 function getGateDistances(
@@ -906,22 +985,15 @@ function getGateDistances(
 }
 
 // ============================================================
-// GATE CLOSURE DECISION
+// GATE CLOSURE
 // ============================================================
 //
-// IMPORTANT:
+// Direction DOES NOT matter.
 //
-// Chennai gate closes for:
-// Chennai -> Gudur
-// Gudur -> Chennai
+// Chennai corridor -> Chennai gate.
+// Tirupati corridor -> Tirupati gate.
 //
-// Tirupati gate closes for:
-// Tirupati -> Gudur
-// Gudur -> Tirupati
-//
-// Direction is NOT used to reject closure.
-//
-// Actual physical position is mandatory.
+// Both directions are allowed.
 //
 // ============================================================
 
@@ -1002,10 +1074,7 @@ function parseTimeToMinutes(
   const text =
     String(value).trim();
 
-  // ----------------------------------------------------------
-  // ISO DATE / DATETIME
-  // ----------------------------------------------------------
-
+  // ISO timestamp
   const date =
     new Date(text);
 
@@ -1015,7 +1084,8 @@ function parseTimeToMinutes(
     )
   ) {
     return (
-      date.getHours() * 60 +
+      date.getHours() *
+        60 +
       date.getMinutes() +
       Number(
         delayMinutes || 0
@@ -1023,10 +1093,7 @@ function parseTimeToMinutes(
     );
   }
 
-  // ----------------------------------------------------------
   // HH:MM
-  // ----------------------------------------------------------
-
   const match =
     text.match(
       /(\d{1,2}):(\d{2})/
@@ -1080,7 +1147,7 @@ function calculateTimeDifference(
 }
 
 // ============================================================
-// GET SPEED
+// SPEED
 // ============================================================
 
 function getUsableSpeed(
@@ -1098,7 +1165,10 @@ function getUsableSpeed(
     train?.speed
   ];
 
-  for (const value of candidates) {
+  for (
+    const value of
+      candidates
+  ) {
     const speed =
       toNumber(value);
 
@@ -1115,7 +1185,7 @@ function getUsableSpeed(
 }
 
 // ============================================================
-// ACTUAL DISTANCE TO GUDUR
+// DISTANCE TO GUDUR
 // ============================================================
 
 function getDistanceToGudur(
@@ -1134,17 +1204,17 @@ function getDistanceToGudur(
 }
 
 // ============================================================
-// ETA CALCULATION
+// ETA
 // ============================================================
 //
-// Priority:
+// First preference:
+// RailRadar's arrival time at Gudur.
 //
-// 1. Actual physical distance to Gudur + actual speed
-// 2. Route arrival time
-// 3. No ETA
+// Second:
+// Actual physical distance + speed.
 //
-// This prevents huge incorrect ETA values caused by
-// total journey distance or origin distance.
+// This prevents incorrect 388/408/453 minute values caused
+// by unrelated journey distances.
 //
 // ============================================================
 
@@ -1157,65 +1227,16 @@ function calculateEta(
   currentMin
 ) {
   // ----------------------------------------------------------
-  // METHOD 1: ACTUAL GPS DISTANCE
-  // ----------------------------------------------------------
-
-  const actualDistance =
-    getDistanceToGudur(
-      position
-    );
-
-  if (
-    actualDistance !== null
-  ) {
-    const speed =
-      getUsableSpeed(
-        position,
-        live,
-        train
-      );
-
-    const etaHours =
-      actualDistance /
-      speed;
-
-    const etaMinutes =
-      Math.max(
-        0,
-        Math.round(
-          etaHours * 60
-        )
-      );
-
-    return {
-      etaMinutes,
-      distanceKm:
-        Number(
-          actualDistance.toFixed(
-            1
-          )
-        ),
-      speedKmph:
-        Number(
-          speed.toFixed(
-            1
-          )
-        ),
-      source:
-        "ACTUAL_DISTANCE"
-    };
-  }
-
-  // ----------------------------------------------------------
-  // METHOD 2: ROUTE ARRIVAL TIME
+  // METHOD 1: ARRIVAL TIME AT GUDUR
   // ----------------------------------------------------------
 
   const arrivalTime =
-    stop?.actualArrival ||
-    stop?.expectedArrival ||
-    stop?.arrival ||
-    live?.expectedArrivalTime ||
-    live?.arrivalTime ||
+    stop.actualArrival ||
+    stop.expectedArrival ||
+    stop.scheduledArrival ||
+    stop.arrival ||
+    live.expectedArrivalTime ||
+    live.arrivalTime ||
     "";
 
   const arrivalMin =
@@ -1234,36 +1255,97 @@ function calculateEta(
       );
 
     if (
-      diff >= 0
+      diff >= 0 &&
+      diff <= 720
     ) {
       return {
         etaMinutes:
           Math.round(diff),
+
         distanceKm:
-          null,
+          getDistanceToGudur(
+            position
+          ) !== null
+            ? Number(
+                getDistanceToGudur(
+                  position
+                ).toFixed(1)
+              )
+            : null,
+
         speedKmph:
-          null,
+          position
+            ? Number(
+                getUsableSpeed(
+                  position,
+                  live,
+                  train
+                ).toFixed(1)
+              )
+            : null,
+
         source:
-          "ARRIVAL_TIME"
+          "RAILRADAR_ARRIVAL"
       };
     }
+  }
+
+  // ----------------------------------------------------------
+  // METHOD 2: ACTUAL DISTANCE
+  // ----------------------------------------------------------
+
+  const actualDistance =
+    getDistanceToGudur(
+      position
+    );
+
+  if (
+    actualDistance !== null
+  ) {
+    const speed =
+      getUsableSpeed(
+        position,
+        live,
+        train
+      );
+
+    const etaMinutes =
+      Math.max(
+        0,
+        Math.round(
+          (actualDistance /
+            speed) *
+            60
+        )
+      );
+
+    return {
+      etaMinutes,
+
+      distanceKm:
+        Number(
+          actualDistance.toFixed(
+            1
+          )
+        ),
+
+      speedKmph:
+        Number(
+          speed.toFixed(
+            1
+          )
+        ),
+
+      source:
+        "ACTUAL_DISTANCE"
+    };
   }
 
   return null;
 }
 
 // ============================================================
-// UPCOMING TRAIN FILTER
-// ============================================================
-//
-// Upcoming trains MUST:
-//
-// - Be MAS/TPTY
-// - Be TOWARD Gudur
-// - Have actual/valid ETA
-// - Be <= 150 km
-// - Be <= 180 minutes
-//
+// UPCOMING FILTER
 // ============================================================
 
 function shouldShowUpcoming(
@@ -1324,7 +1406,7 @@ function shouldShowUpcoming(
 }
 
 // ============================================================
-// FIREBASE TRAIN OBJECT
+// UPCOMING OBJECT
 // ============================================================
 
 function makeUpcomingTrain(
@@ -1392,7 +1474,10 @@ async function fetchLiveTrain(
   let lastError =
     null;
 
-  for (const endpoint of endpoints) {
+  for (
+    const endpoint of
+      endpoints
+  ) {
     try {
       console.log(
         `   Live request: ${endpoint}`
@@ -1423,6 +1508,7 @@ async function fetchLiveTrain(
         );
 
       return response.data;
+
     } catch (error) {
       lastError =
         error;
@@ -1448,7 +1534,7 @@ async function fetchLiveTrain(
 }
 
 // ============================================================
-// MERGE LIVE RESPONSE
+// MERGE DATA
 // ============================================================
 
 function mergeVerifiedData(
@@ -1541,7 +1627,7 @@ function mergeVerifiedData(
 }
 
 // ============================================================
-// UPDATE GATE SYSTEM
+// UPDATE SYSTEM
 // ============================================================
 
 async function updateGateSystem() {
@@ -1561,10 +1647,6 @@ async function updateGateSystem() {
       `\n[${now.toLocaleTimeString()}] Querying RailRadar Live Station Board for GDR...`
     );
 
-    // ----------------------------------------------------------
-    // CHECK API KEY
-    // ----------------------------------------------------------
-
     if (
       !RAILRADAR_API_KEY
     ) {
@@ -1573,9 +1655,9 @@ async function updateGateSystem() {
       );
     }
 
-    // ----------------------------------------------------------
+    // ========================================================
     // STATION BOARD
-    // ----------------------------------------------------------
+    // ========================================================
 
     const boardRes =
       await axios.get(
@@ -1598,35 +1680,21 @@ async function updateGateSystem() {
         }
       );
 
-    let trainsArray =
-      boardRes.data?.data
-        ?.trains || [];
-
-    if (
-      !Array.isArray(
-        trainsArray
+    const trainsArray =
+      Array.isArray(
+        boardRes.data?.data
+          ?.trains
       )
-    ) {
-      trainsArray = [];
-    }
+        ? boardRes.data.data.trains
+        : [];
 
     console.log(
       `✅ RailRadar returned ${trainsArray.length} trains.`
     );
 
-    // ----------------------------------------------------------
-    // LIMIT BOARD CANDIDATES
-    // ----------------------------------------------------------
-
-    trainsArray =
-      trainsArray.slice(
-        0,
-        MAX_BOARD_CANDIDATES
-      );
-
-    // ----------------------------------------------------------
+    // ========================================================
     // DEFAULT GATES
-    // ----------------------------------------------------------
+    // ========================================================
 
     let masGate = {
       status:
@@ -1662,25 +1730,21 @@ async function updateGateSystem() {
         "TPTY"
     };
 
-    // ----------------------------------------------------------
-    // UPCOMING LIST
-    // ----------------------------------------------------------
-
     const upcomingList =
       [];
-
-    // ----------------------------------------------------------
-    // VERIFIED TRAINS
-    // ----------------------------------------------------------
 
     const verifiedTrains =
       [];
 
     let apiRequests = 1;
 
-    // ----------------------------------------------------------
-    // PROCESS BOARD
-    // ----------------------------------------------------------
+    // ========================================================
+    // PROCESS ALL BOARD TRAINS
+    // ========================================================
+    //
+    // We no longer ignore trains after #7.
+    //
+    // ========================================================
 
     for (
       let i = 0;
@@ -1688,19 +1752,20 @@ async function updateGateSystem() {
         trainsArray.length;
       i++
     ) {
-      if (
-        verifiedTrains.length >=
-        MAX_LIVE_VERIFICATIONS
-      ) {
-        break;
-      }
-
       const item =
         trainsArray[i] ||
         {};
 
       const boardTrain =
         item.train ||
+        {};
+
+      const boardLive =
+        item.live ||
+        {};
+
+      const boardStop =
+        item.stop ||
         {};
 
       const trainNo =
@@ -1715,46 +1780,230 @@ async function updateGateSystem() {
         continue;
       }
 
-      try {
-        const liveResponse =
-          await fetchLiveTrain(
-            trainNo
+      const trainName =
+        boardTrain.name ||
+        item.trainName ||
+        `Express ${trainNo}`;
+
+      const origin =
+        getOrigin(
+          boardTrain,
+          item
+        );
+
+      const destination =
+        getDestination(
+          boardTrain,
+          item
+        );
+
+      const boardDelay =
+        Number(
+          boardLive.delayMinutes ||
+            item.delayMinutes ||
+            0
+        );
+
+      // ------------------------------------------------------
+      // TRY TO GET USEFUL BOARD ETA
+      // ------------------------------------------------------
+
+      const boardArrival =
+        boardStop.arrival ||
+        boardStop.expectedArrival ||
+        boardStop.scheduledArrival ||
+        boardLive.expectedArrivalTime ||
+        item.expectedArrivalTime ||
+        "";
+
+      const boardArrivalMin =
+        parseTimeToMinutes(
+          boardArrival,
+          0
+        );
+
+      let boardEta =
+        null;
+
+      if (
+        boardArrivalMin !== -1
+      ) {
+        const diff =
+          calculateTimeDifference(
+            boardArrivalMin,
+            currentMin
           );
 
-        apiRequests++;
+        if (
+          diff >= 0 &&
+          diff <= 720
+        ) {
+          boardEta =
+            Math.round(diff);
+        }
+      }
 
-        const processedData =
-          mergeVerifiedData(
-            item,
-            liveResponse
-          );
+      // ------------------------------------------------------
+      // BOARD CORRIDOR
+      // ------------------------------------------------------
 
-        verifiedTrains.push(
-          {
+      const boardCorridor =
+        determinePhysicalCorridor(
+          boardTrain,
+          boardLive,
+          item
+        );
+
+      // ------------------------------------------------------
+      // BOARD DIRECTION
+      // ------------------------------------------------------
+
+      const boardDirection =
+        getRouteDirection(
+          boardTrain,
+          boardLive,
+          item
+        );
+
+      // ------------------------------------------------------
+      // LOG EVERY BOARD TRAIN
+      // ------------------------------------------------------
+
+      console.log(
+        `[BOARD ${i + 1}/${trainsArray.length}] ${trainNo} ${trainName} | ${boardCorridor || "UNKNOWN"} | ${boardDirection} | ETA ${boardEta ?? "?"}m`
+      );
+
+      // ------------------------------------------------------
+      // LIVE VERIFICATION
+      // ------------------------------------------------------
+      //
+      // Verify trains that are:
+      //
+      // 1. likely upcoming
+      // 2. relevant corridor
+      // 3. potentially near gate
+      //
+      // We can still verify a limited number to control
+      // API usage.
+      //
+      // ------------------------------------------------------
+
+      const shouldVerify =
+        verifiedTrains.length <
+          MAX_LIVE_VERIFICATIONS &&
+        (
+          boardCorridor === "MAS" ||
+          boardCorridor === "TPTY"
+        );
+
+      if (
+        shouldVerify
+      ) {
+        try {
+          const liveResponse =
+            await fetchLiveTrain(
+              trainNo
+            );
+
+          apiRequests++;
+
+          const verifiedData =
+            mergeVerifiedData(
+              item,
+              liveResponse
+            );
+
+          verifiedTrains.push({
             item,
             data:
-              processedData
-          }
-        );
+              verifiedData
+          });
 
-      } catch (error) {
-        console.error(
-          `   ⚠️ Live verification failed for ${trainNo}: ${error.message}`
-        );
+        } catch (error) {
+          apiRequests++;
 
-        // Do not count failed alternative
-        // endpoints separately here.
-        apiRequests++;
+          console.error(
+            `   ⚠️ Live verification failed for ${trainNo}: ${error.message}`
+          );
+        }
+      }
+
+      // ------------------------------------------------------
+      // IMPORTANT:
+      //
+      // If board data itself says this is a relevant inbound
+      // train and ETA is available, add it now.
+      //
+      // This means upcoming trains are NOT dependent on
+      // successful live verification.
+      //
+      // ------------------------------------------------------
+
+      if (
+        (
+          boardCorridor === "MAS" ||
+          boardCorridor === "TPTY"
+        ) &&
+        boardDirection ===
+          "TOWARD_GUDUR" &&
+        boardEta !== null &&
+        boardEta <=
+          UPCOMING_MAX_ETA_MINUTES
+      ) {
+        upcomingList.push({
+          trainNo,
+
+          name:
+            trainName,
+
+          origin:
+            origin ||
+            "Southern side",
+
+          destination:
+            destination ||
+            "Gudur",
+
+          etaMinutes:
+            boardEta,
+
+          distanceKm:
+            null,
+
+          speedKmph:
+            null,
+
+          delayMinutes:
+            boardDelay,
+
+          corridor:
+            boardCorridor,
+
+          direction:
+            "TOWARD_GUDUR",
+
+          platform:
+            boardLive.platform ||
+            boardStop.platform ||
+            item.platform ||
+            "—",
+
+          etaSource:
+            "STATION_BOARD",
+
+          positionSource:
+            "BOARD"
+        });
+
+        console.log(
+          `   ➜ [BOARD UPCOMING] ${trainNo} | ${boardCorridor} | ETA ${boardEta}m`
+        );
       }
     }
 
-    console.log(
-      `✅ Verified ${verifiedTrains.length} trains.`
-    );
-
-    // ==========================================================
+    // ========================================================
     // PROCESS VERIFIED TRAINS
-    // ==========================================================
+    // ========================================================
 
     for (
       const verified of
@@ -1814,9 +2063,9 @@ async function updateGateSystem() {
             0
         );
 
-      // --------------------------------------------------------
-      // CURRENT POSITION
-      // --------------------------------------------------------
+      // ------------------------------------------------------
+      // ACTUAL POSITION
+      // ------------------------------------------------------
 
       const position =
         getActualPosition(
@@ -1829,9 +2078,9 @@ async function updateGateSystem() {
         position?.source ||
         "NONE";
 
-      // --------------------------------------------------------
+      // ------------------------------------------------------
       // CORRIDOR
-      // --------------------------------------------------------
+      // ------------------------------------------------------
 
       const corridor =
         determinePhysicalCorridor(
@@ -1840,9 +2089,9 @@ async function updateGateSystem() {
           item
         );
 
-      // --------------------------------------------------------
+      // ------------------------------------------------------
       // DIRECTION
-      // --------------------------------------------------------
+      // ------------------------------------------------------
 
       const direction =
         getRouteDirection(
@@ -1851,18 +2100,18 @@ async function updateGateSystem() {
           item
         );
 
-      // --------------------------------------------------------
-      // GATE DISTANCES
-      // --------------------------------------------------------
+      // ------------------------------------------------------
+      // GATE DISTANCE
+      // ------------------------------------------------------
 
       const gateDistances =
         getGateDistances(
           position
         );
 
-      // --------------------------------------------------------
-      // GATE CLOSURE
-      // --------------------------------------------------------
+      // ------------------------------------------------------
+      // GATE DECISION
+      // ------------------------------------------------------
 
       const gateDecision =
         shouldCloseGate(
@@ -1871,39 +2120,9 @@ async function updateGateSystem() {
           gateDistances
         );
 
-      // --------------------------------------------------------
-      // ARRIVAL / DEPARTURE
-      // --------------------------------------------------------
-
-      const arrTimeStr =
-        stop.actualArrival ||
-        stop.expectedArrival ||
-        stop.arrival ||
-        live.expectedArrivalTime ||
-        "";
-
-      const depTimeStr =
-        stop.actualDeparture ||
-        stop.expectedDeparture ||
-        stop.departure ||
-        live.expectedDepartureTime ||
-        "";
-
-      const arrMin =
-        parseTimeToMinutes(
-          arrTimeStr,
-          0
-        );
-
-      const depMin =
-        parseTimeToMinutes(
-          depTimeStr,
-          0
-        );
-
-      // --------------------------------------------------------
+      // ------------------------------------------------------
       // ETA
-      // --------------------------------------------------------
+      // ------------------------------------------------------
 
       const eta =
         calculateEta(
@@ -1915,130 +2134,34 @@ async function updateGateSystem() {
           currentMin
         );
 
-      let etaMinutes =
-        eta?.etaMinutes ??
-        null;
-
-      // --------------------------------------------------------
-      // NEVER ALLOW INVALID NEGATIVE ETA
-      // --------------------------------------------------------
-
-      if (
-        etaMinutes !== null &&
-        etaMinutes < 0
-      ) {
-        etaMinutes = 0;
-      }
-
-      // --------------------------------------------------------
-      // AT GUDUR / PAST GUDUR
-      // --------------------------------------------------------
-
-      const routeDirection =
-        direction;
-
-      const isAtGudur =
-        routeDirection ===
-        "AT_GUDUR";
-
-      const isPastGudur =
-        routeDirection ===
-        "AWAY_FROM_GUDUR";
-
-      // --------------------------------------------------------
-      // UPCOMING
-      // --------------------------------------------------------
-
-      const processed = {
-        trainNo,
-
-        trainName,
-
-        origin,
-
-        destination,
-
-        corridor,
-
-        direction:
-          routeDirection,
-
-        etaMinutes,
-
-        distanceKm:
-          eta?.distanceKm ??
-          null,
-
-        speedKmph:
-          eta?.speedKmph ??
-          null,
-
-        etaSource:
-          eta?.source ||
-          "NONE",
-
-        positionSource,
-
-        delayMinutes:
-          delayMin,
-
-        platform:
-          live.platform ||
-          stop.platform ||
-          train.platform ||
-          item.platform ||
-          "—"
-      };
-
-      if (
-        !isAtGudur &&
-        !isPastGudur &&
-        shouldShowUpcoming(
-          processed
-        )
-      ) {
-        upcomingList.push(
-          makeUpcomingTrain(
-            processed
-          )
-        );
-
-        console.log(
-          `[UPCOMING ${corridor}] ${trainNo} ${trainName} | ${origin || "Unknown"} -> ${destination || "Gudur"} | ${etaMinutes}m | ${eta?.distanceKm ?? "?"} km`
-        );
-      }
-
-      // --------------------------------------------------------
+      // ------------------------------------------------------
       // GATE CLOSURE
-      // --------------------------------------------------------
-      //
-      // IMPORTANT:
-      //
-      // Direction does NOT matter here.
-      //
-      // Physical distance decides closure.
-      //
-      // --------------------------------------------------------
+      // ------------------------------------------------------
 
       if (
         gateDecision.close
       ) {
-        const gateWait =
+        const speed =
+          getUsableSpeed(
+            position,
+            live,
+            train
+          );
+
+        const travelMinutes =
+          (
+            gateDecision.distanceKm /
+            speed
+          ) *
+          60;
+
+        const waitTime =
           Math.max(
             1,
             Math.min(
               15,
               Math.round(
-                (gateDecision.distanceKm /
-                  Math.max(
-                    getUsableSpeed(
-                      position,
-                      live,
-                      train
-                    ),
-                    MIN_SPEED_KMPH
-                  )) *
-                  60
+                travelMinutes
               ) + 2
             )
           );
@@ -2056,7 +2179,7 @@ async function updateGateSystem() {
             "CLOSED",
 
           waitMinutes:
-            gateWait,
+            waitTime,
 
           activeTrain:
             label,
@@ -2086,7 +2209,7 @@ async function updateGateSystem() {
             payload;
 
           console.log(
-            `🚨 CHENNAI GATE CLOSED | ${label} | ${gateDecision.distanceKm.toFixed(3)} km`
+            `🚨 CHENNAI GATE CLOSED | ${label} | ${gateDecision.distanceKm.toFixed(3)} km | ${direction}`
           );
         }
 
@@ -2098,49 +2221,171 @@ async function updateGateSystem() {
             payload;
 
           console.log(
-            `🚨 TIRUPATI GATE CLOSED | ${label} | ${gateDecision.distanceKm.toFixed(3)} km`
+            `🚨 TIRUPATI GATE CLOSED | ${label} | ${gateDecision.distanceKm.toFixed(3)} km | ${direction}`
+          );
+        }
+      }
+
+      // ------------------------------------------------------
+      // VERIFIED UPCOMING
+      // ------------------------------------------------------
+
+      if (
+        direction ===
+          "TOWARD_GUDUR" &&
+        (
+          corridor ===
+            "MAS" ||
+          corridor ===
+            "TPTY"
+        ) &&
+        eta
+      ) {
+        const verifiedUpcoming = {
+          trainNo,
+
+          name:
+            trainName,
+
+          origin:
+            origin ||
+            "Southern side",
+
+          destination:
+            destination ||
+            "Gudur",
+
+          etaMinutes:
+            eta.etaMinutes,
+
+          distanceKm:
+            eta.distanceKm,
+
+          speedKmph:
+            eta.speedKmph,
+
+          delayMinutes:
+            delayMin,
+
+          corridor,
+
+          direction:
+            "TOWARD_GUDUR",
+
+          platform:
+            live.platform ||
+            stop.platform ||
+            train.platform ||
+            item.platform ||
+            "—",
+
+          etaSource:
+            eta.source,
+
+          positionSource
+        };
+
+        if (
+          shouldShowUpcoming(
+            verifiedUpcoming
+          )
+        ) {
+          upcomingList.push(
+            verifiedUpcoming
+          );
+
+          console.log(
+            `   ➜ [LIVE UPCOMING] ${trainNo} ${trainName} | ${corridor} | ${eta.etaMinutes}m | ${eta.distanceKm ?? "?"} km`
           );
         }
       }
     }
 
-    // ==========================================================
-    // SORT UPCOMING
-    // ==========================================================
+    // ========================================================
+    // REMOVE DUPLICATES
+    // ========================================================
 
-    upcomingList.sort(
-      (a, b) =>
-        a.etaMinutes -
-        b.etaMinutes
-    );
+    const uniqueMap =
+      new Map();
 
-    // ==========================================================
-    // MAX 5 UPCOMING TRAINS
-    // ==========================================================
+    for (
+      const train of
+        upcomingList
+    ) {
+      const key =
+        train.trainNo;
 
-    const topUpcoming =
-      upcomingList.slice(
-        0,
-        5
+      // Prefer live data over board data.
+      if (
+        !uniqueMap.has(key) ||
+        train.etaSource !==
+          "STATION_BOARD"
+      ) {
+        uniqueMap.set(
+          key,
+          train
+        );
+      }
+    }
+
+    const uniqueUpcoming =
+      Array.from(
+        uniqueMap.values()
       );
 
-    // ==========================================================
-    // EXTRA SAFETY:
-    // REMOVE ANYTHING ABOVE 180 MINUTES
-    // ==========================================================
+    // ========================================================
+    // FINAL UPCOMING FILTER
+    // ========================================================
 
     const safeUpcoming =
-      topUpcoming.filter(
-        (train) =>
-          Number(
-            train.etaMinutes
-          ) <=
-          UPCOMING_MAX_ETA_MINUTES
-      );
+      uniqueUpcoming
+        .filter(
+          (train) =>
+            train.corridor ===
+              "MAS" ||
+            train.corridor ===
+              "TPTY"
+        )
+        .filter(
+          (train) =>
+            train.direction ===
+            "TOWARD_GUDUR"
+        )
+        .filter(
+          (train) =>
+            Number(
+              train.etaMinutes
+            ) <=
+            UPCOMING_MAX_ETA_MINUTES
+        )
+        .filter(
+          (train) =>
+            train.distanceKm ===
+              null ||
+            train.distanceKm ===
+              undefined ||
+            Number(
+              train.distanceKm
+            ) <=
+              UPCOMING_MAX_DISTANCE_KM
+        )
+        .sort(
+          (a, b) =>
+            Number(
+              a.etaMinutes
+            ) -
+            Number(
+              b.etaMinutes
+            )
+        )
+        .slice(
+          0,
+          5
+        );
 
-    // ==========================================================
+    // ========================================================
     // DURATION
-    // ==========================================================
+    // ========================================================
 
     const durationSeconds =
       (
@@ -2149,9 +2394,9 @@ async function updateGateSystem() {
       ) /
       1000;
 
-    // ==========================================================
-    // FIREBASE WRITE
-    // ==========================================================
+    // ========================================================
+    // FIREBASE
+    // ========================================================
 
     await gateRef.set({
       tirupatiGate:
@@ -2192,9 +2437,9 @@ async function updateGateSystem() {
         )
     });
 
-    // ==========================================================
-    // SUCCESS LOG
-    // ==========================================================
+    // ========================================================
+    // LOG
+    // ========================================================
 
     console.log(
       "\n=========================================="
@@ -2247,7 +2492,7 @@ async function updateGateSystem() {
       safeUpcoming.forEach(
         (train) => {
           console.log(
-            ` ${train.corridor} | ${train.trainNo} ${train.name} | ${train.distanceKm ?? "?"} km | ETA ${train.etaMinutes}m`
+            ` ${train.corridor} | ${train.trainNo} ${train.name} | ETA ${train.etaMinutes}m | ${train.etaSource}`
           );
         }
       );
@@ -2261,7 +2506,7 @@ async function updateGateSystem() {
 
   } catch (error) {
     // ========================================================
-    // ERROR HANDLING
+    // ERROR
     // ========================================================
 
     console.error(
@@ -2293,10 +2538,9 @@ async function updateGateSystem() {
       );
     }
 
-    // ----------------------------------------------------------
-    // ALWAYS FAIL SAFE:
-    // OPEN GATES
-    // ----------------------------------------------------------
+    // ========================================================
+    // FAIL SAFE
+    // ========================================================
 
     try {
       await gateRef.set({
@@ -2366,7 +2610,7 @@ async function updateGateSystem() {
 }
 
 // ============================================================
-// START APPLICATION
+// START
 // ============================================================
 
 console.log(
@@ -2422,11 +2666,15 @@ console.log(
 );
 
 console.log(
+  `Live verification limit: ${MAX_LIVE_VERIFICATIONS}`
+);
+
+console.log(
   "=========================================="
 );
 
 // ============================================================
-// GITHUB ACTIONS MODE
+// GITHUB ACTIONS
 // ============================================================
 
 if (
@@ -2468,9 +2716,9 @@ if (
 
 } else {
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // LOCAL MODE
-  // ----------------------------------------------------------
+  // ==========================================================
 
   updateGateSystem();
 
