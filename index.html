@@ -21,10 +21,6 @@
 
   <style>
 
-    /* =========================================================
-       ROOT
-       ========================================================= */
-
     :root {
       --bg: #06090e;
       --surface: #0e141f;
@@ -43,11 +39,6 @@
       --amber: #ffb800;
     }
 
-
-    /* =========================================================
-       RESET
-       ========================================================= */
-
     * {
       box-sizing: border-box;
       margin: 0;
@@ -59,11 +50,6 @@
         'Noto Sans Devanagari',
         sans-serif;
     }
-
-
-    /* =========================================================
-       BODY
-       ========================================================= */
 
     body {
       background: var(--bg);
@@ -81,11 +67,6 @@
         color 0.25s ease;
     }
 
-
-    /* =========================================================
-       APP
-       ========================================================= */
-
     .app {
       width: 100%;
       max-width: 580px;
@@ -95,11 +76,6 @@
 
       gap: 14px;
     }
-
-
-    /* =========================================================
-       TOP HUD HEADER
-       ========================================================= */
 
     .hud-header {
       display: flex;
@@ -133,11 +109,6 @@
 
       margin-top: 2px;
     }
-
-
-    /* =========================================================
-       HEADER CONTROLS
-       ========================================================= */
 
     .header-controls {
       display: flex;
@@ -192,11 +163,6 @@
         0 0 10px rgba(0, 240, 118, 0.25);
     }
 
-
-    /* =========================================================
-       THEME
-       ========================================================= */
-
     .theme-switcher {
       display: flex;
       align-items: center;
@@ -230,11 +196,6 @@
     .theme-btn:active {
       transform: translateY(0);
     }
-
-
-    /* =========================================================
-       LIGHT MODE
-       ========================================================= */
 
     body.light-mode {
       --bg: #f3f6fa;
@@ -325,11 +286,6 @@
       color: #475569 !important;
     }
 
-
-    /* =========================================================
-       TRANSITIONS
-       ========================================================= */
-
     body,
     .hud-header,
     .gate-card,
@@ -346,11 +302,6 @@
         color 0.25s ease,
         border-color 0.25s ease;
     }
-
-
-    /* =========================================================
-       ADVISORY BOX
-       ========================================================= */
 
     .decision-hub {
       padding: 14px;
@@ -432,11 +383,6 @@
       text-decoration: none;
     }
 
-
-    /* =========================================================
-       GATE PANELS
-       ========================================================= */
-
     .gate-card {
       background: var(--surface);
 
@@ -475,11 +421,6 @@
 
       margin-top: 2px;
     }
-
-
-    /* =========================================================
-       GATE STATUS + SIGNAL
-       ========================================================= */
 
     .gate-controls {
       display: flex;
@@ -544,7 +485,6 @@
     }
 
     @keyframes stopPulse {
-
       0%,
       100% {
         opacity: 1;
@@ -597,11 +537,6 @@
       box-shadow:
         var(--green-glow);
     }
-
-
-    /* =========================================================
-       CROSSING GRAPHIC
-       ========================================================= */
 
     .crossing-graphic {
       height: 46px;
@@ -702,11 +637,6 @@
       transform-origin: right center;
     }
 
-
-    /* =========================================================
-       CENTER STOP SYMBOL ON GATE
-       ========================================================= */
-
     .gate-stop-symbol {
       position: absolute;
 
@@ -745,7 +675,6 @@
     }
 
     @keyframes centerStopPulse {
-
       0%,
       100% {
         transform:
@@ -779,11 +708,6 @@
       box-shadow:
         0 0 10px rgba(255, 42, 85, 0.6);
     }
-
-
-    /* =========================================================
-       GATE READOUTS
-       ========================================================= */
 
     .gate-readouts {
       display: grid;
@@ -846,11 +770,6 @@
 
       text-align: right;
     }
-
-
-    /* =========================================================
-       UPCOMING TRAINS
-       ========================================================= */
 
     details.upcoming-wrapper {
       background: var(--surface);
@@ -996,7 +915,6 @@
       color: #fbbf24;
     }
 
-    /* OTHER / UNCLASSIFIED CORRIDOR */
     .corridor-other {
       background: rgba(148, 163, 184, 0.18);
 
@@ -1019,16 +937,33 @@
       color: #38bdf8;
     }
 
+    .eta-min.urgent {
+      color: var(--amber);
+    }
+
+    .eta-min.arriving {
+      color: var(--red);
+
+      animation:
+        etaPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes etaPulse {
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.45;
+      }
+    }
+
     .eta-sub {
       font-size: 0.65rem;
 
       color: var(--dim);
     }
-
-
-    /* =========================================================
-       EMPTY QUEUE
-       ========================================================= */
 
     .upcoming-empty {
       text-align: center;
@@ -1041,11 +976,6 @@
 
       line-height: 1.4;
     }
-
-
-    /* =========================================================
-       SAFETY PANEL
-       ========================================================= */
 
     .safety-panel {
       background: var(--surface);
@@ -1133,11 +1063,6 @@
       color: var(--amber);
     }
 
-
-    /* =========================================================
-       LANGUAGE VISIBILITY
-       ========================================================= */
-
     body.lang-en .lang-te-only,
     body.lang-en .lang-hi-only {
       display: none !important;
@@ -1153,11 +1078,6 @@
       display: none !important;
     }
 
-
-    /* =========================================================
-       FOOTER
-       ========================================================= */
-
     footer {
       display: flex;
 
@@ -1171,11 +1091,6 @@
 
       font-family: 'JetBrains Mono', monospace;
     }
-
-
-    /* =========================================================
-       MOBILE HEADER
-       ========================================================= */
 
     @media (max-width: 520px) {
 
@@ -1215,7 +1130,6 @@
       }
     }
 
-
     @media (max-width: 390px) {
 
       .gate-meta h2 {
@@ -1250,9 +1164,8 @@
 
   <div class="app">
 
-
     <!-- =====================================================
-         TOP HEADER
+         HEADER
          ===================================================== -->
 
     <header class="hud-header">
@@ -1277,7 +1190,6 @@
 
       </div>
 
-
       <div class="header-controls">
 
         <div class="theme-switcher">
@@ -1293,7 +1205,6 @@
           </button>
 
         </div>
-
 
         <div class="lang-switcher">
 
@@ -1364,14 +1275,12 @@
 
       </div>
 
-
       <div
         class="route-action"
         id="decision-title"
       >
         Both Crossings Are Open
       </div>
-
 
       <div
         class="route-desc"
@@ -1380,7 +1289,6 @@
         No trains approaching Gudur Junction.
         Corridors are clear for transit.
       </div>
-
 
       <a
         href="https://www.google.com/maps/dir/?api=1&destination=Gudur+Junction+Railway+Station"
@@ -1435,7 +1343,6 @@
 
         </div>
 
-
         <div class="gate-controls">
 
           <div
@@ -1444,7 +1351,6 @@
           >
             GO
           </div>
-
 
           <div class="signal-box">
 
@@ -1463,7 +1369,6 @@
         </div>
 
       </div>
-
 
       <div class="crossing-graphic">
 
@@ -1493,7 +1398,6 @@
 
       </div>
 
-
       <div class="gate-readouts">
 
         <div>
@@ -1518,7 +1422,6 @@
           </div>
 
         </div>
-
 
         <div>
 
@@ -1576,7 +1479,6 @@
 
         </div>
 
-
         <div class="gate-controls">
 
           <div
@@ -1585,7 +1487,6 @@
           >
             GO
           </div>
-
 
           <div class="signal-box">
 
@@ -1604,7 +1505,6 @@
         </div>
 
       </div>
-
 
       <div class="crossing-graphic">
 
@@ -1634,7 +1534,6 @@
 
       </div>
 
-
       <div class="gate-readouts">
 
         <div>
@@ -1659,7 +1558,6 @@
           </div>
 
         </div>
-
 
         <div>
 
@@ -1716,13 +1614,11 @@
 
         </span>
 
-
         <span class="summary-arrow">
           ▼
         </span>
 
       </summary>
-
 
       <div
         class="upcoming-body"
@@ -1742,7 +1638,6 @@
             </div>
 
           </div>
-
 
           <div class="eta-col">
 
@@ -1789,7 +1684,6 @@
 
       </div>
 
-
       <ul class="safety-list lang-en-only">
 
         <li class="safety-item">
@@ -1802,13 +1696,11 @@
             <strong>
               Never cross when gates close:
             </strong>
-
             Crawling under barriers is a severe
             punishable railway offense.
           </span>
 
         </li>
-
 
         <li class="safety-item">
 
@@ -1820,13 +1712,11 @@
             <strong>
               Stop, Look, Listen:
             </strong>
-
             Always halt behind the white stop line
             whenever the red signal lamp is illuminated.
           </span>
 
         </li>
-
 
         <li class="safety-item">
 
@@ -1838,13 +1728,11 @@
             <strong>
               No Earphones:
             </strong>
-
             Never use mobile phones or wear headphones
             near active tracks.
           </span>
 
         </li>
-
 
         <li class="safety-item">
 
@@ -1856,7 +1744,6 @@
             <strong>
               Wait for Full Clearance:
             </strong>
-
             Wait until both barrier booms lift completely
             and the green light turns on.
           </span>
@@ -1864,7 +1751,6 @@
         </li>
 
       </ul>
-
 
       <ul class="safety-list lang-te-only">
 
@@ -1878,13 +1764,11 @@
             <strong>
               గేట్ మూసివేసేటప్పుడు దాటరాదు:
             </strong>
-
             బూమ్ బారియర్ కింద నుంచి లేదా సందుల నుండి
             వెళ్లడం చట్టరీత్యా నేరం.
           </span>
 
         </li>
-
 
         <li class="safety-item">
 
@@ -1896,13 +1780,11 @@
             <strong>
               ఆగండి, చూడండి, వినండి:
             </strong>
-
             ఎరుపు లైట్ వెలుగుతున్నప్పుడు వాహనాన్ని
             స్టాప్ లైన్ వెనుకే నిలపండి.
           </span>
 
         </li>
-
 
         <li class="safety-item">
 
@@ -1914,13 +1796,11 @@
             <strong>
               హెడ్‌ఫోన్లు వాడకండి:
             </strong>
-
             ట్రాక్ సమీపంలో నడుస్తున్నప్పుడు లేదా వాహనం
             నడుపుతున్నప్పుడు ఫోన్లు వాడవద్దు.
           </span>
 
         </li>
-
 
         <li class="safety-item">
 
@@ -1932,7 +1812,6 @@
             <strong>
               గేట్ పూర్తిగా తెరిచేవరకు ఆగండి:
             </strong>
-
             ఆకుపచ్చ లైట్ వెలిగి గేట్ పూర్తిగా పైకి
             లేచిన తర్వాతే వెళ్లండి.
           </span>
@@ -1940,7 +1819,6 @@
         </li>
 
       </ul>
-
 
       <ul class="safety-list lang-hi-only">
 
@@ -1954,13 +1832,11 @@
             <strong>
               फाटक बंद होते समय पार न करें:
             </strong>
-
             बूम बैरियर के नीचे से निकलना रेलवे कानून
             के तहत अपराध है।
           </span>
 
         </li>
-
 
         <li class="safety-item">
 
@@ -1972,13 +1848,11 @@
             <strong>
               रुकें, देखें और सुनें:
             </strong>
-
             लाल बत्ती जलने पर अपने वाहन को स्टॉप लाइन
             के पीछे ही रोकें।
           </span>
 
         </li>
-
 
         <li class="safety-item">
 
@@ -1990,13 +1864,11 @@
             <strong>
               ईयरफोन का प्रयोग न करें:
             </strong>
-
             ट्रैक के पास फोन या हेडफ़ोन का प्रयोग
             बिल्कुल न करें।
           </span>
 
         </li>
-
 
         <li class="safety-item">
 
@@ -2008,7 +1880,6 @@
             <strong>
               फाटक पूरी तरह खुलने दें:
             </strong>
-
             दोनों बूम पूरी तरह ऊपर उठने और हरी बत्ती
             जलने के बाद ही आगे बढ़ें।
           </span>
@@ -2157,7 +2028,7 @@
 
 
   <!-- =======================================================
-       LANGUAGE SWITCHER + LIVE UI
+       LANGUAGE + LIVE UI
        ======================================================= -->
 
   <script>
@@ -2170,18 +2041,15 @@
         lang = 'en';
       }
 
-
       document.body.classList.remove(
         'lang-en',
         'lang-te',
         'lang-hi'
       );
 
-
       document.body.classList.add(
         'lang-' + lang
       );
-
 
       const btnEn =
         document.getElementById(
@@ -2198,7 +2066,6 @@
           'btn-hi'
         );
 
-
       if (btnEn) {
 
         btnEn.className =
@@ -2209,7 +2076,6 @@
               : ''
           );
       }
-
 
       if (btnTe) {
 
@@ -2222,7 +2088,6 @@
           );
       }
 
-
       if (btnHi) {
 
         btnHi.className =
@@ -2234,12 +2099,10 @@
           );
       }
 
-
       localStorage.setItem(
         'gdr-language',
         lang
       );
-
 
       if (window.__lastData) {
 
@@ -2249,10 +2112,6 @@
       }
     }
 
-
-    /* =========================================================
-       SAFE TEXT
-       ========================================================= */
 
     function safeText(value) {
 
@@ -2267,9 +2126,388 @@
     }
 
 
-    /* =========================================================
+    /*
+     * ========================================================
+     * ETA COUNTDOWN SYSTEM
+     * ========================================================
+     *
+     * Firebase may say:
+     *
+     *     etaMinutes: 10
+     *
+     * That does NOT mean the page should permanently display
+     * 10m.
+     *
+     * We store the Firebase sync time and subtract the amount
+     * of real time that has passed since that sync.
+     *
+     * Example:
+     *
+     * Firebase update:
+     *
+     *     ETA = 10 minutes
+     *
+     * 2 minutes later:
+     *
+     *     Page shows 8 minutes
+     *
+     * This updates every second.
+     *
+     * The GitHub monitor still provides the authoritative
+     * refreshed train position every cycle.
+     *
+     * ========================================================
+     */
+
+    window.__etaReferenceTime = null;
+
+
+    function getFirebaseSyncTime(data) {
+
+      /*
+       * Best option:
+       *
+       * backend can provide:
+       *
+       * lastUpdatedAt
+       *
+       * as an ISO timestamp.
+       */
+
+      if (
+        data &&
+        data.lastUpdatedAt
+      ) {
+
+        const timestamp =
+          Date.parse(
+            data.lastUpdatedAt
+          );
+
+        if (
+          Number.isFinite(timestamp)
+        ) {
+
+          return timestamp;
+        }
+      }
+
+
+      /*
+       * Second option:
+       *
+       * lastUpdatedLocal
+       *
+       */
+
+      if (
+        data &&
+        data.lastUpdatedLocal
+      ) {
+
+        const timestamp =
+          Date.parse(
+            data.lastUpdatedLocal
+          );
+
+        if (
+          Number.isFinite(timestamp)
+        ) {
+
+          return timestamp;
+        }
+      }
+
+
+      /*
+       * Last fallback:
+       *
+       * When backend only gives a clock string such as:
+       *
+       * 5:15:31 PM
+       *
+       * convert it to today's local date.
+       */
+
+      if (
+        data &&
+        data.lastUpdated
+      ) {
+
+        const text =
+          String(
+            data.lastUpdated
+          ).trim();
+
+        const now =
+          new Date();
+
+        const parsed =
+          new Date(
+            `${now.toDateString()} ${text}`
+          );
+
+        if (
+          !isNaN(
+            parsed.getTime()
+          )
+        ) {
+
+          return parsed.getTime();
+        }
+      }
+
+
+      /*
+       * If no usable timestamp exists,
+       * use the moment Firebase delivered
+       * this data.
+       */
+
+      return Date.now();
+    }
+
+
+    function calculateLiveEtaMinutes(
+      originalEta,
+      referenceTime
+    ) {
+
+      const eta =
+        Number(
+          originalEta
+        );
+
+      if (
+        !Number.isFinite(eta)
+      ) {
+
+        return null;
+      }
+
+      if (
+        !referenceTime
+      ) {
+
+        return Math.max(
+          0,
+          Math.round(eta)
+        );
+      }
+
+
+      const elapsedMs =
+        Date.now() -
+        referenceTime;
+
+      const elapsedMinutes =
+        elapsedMs / 60000;
+
+
+      /*
+       * Keep the original ETA precision internally,
+       * but display whole minutes.
+       */
+
+      const liveEta =
+        eta -
+        elapsedMinutes;
+
+
+      return Math.max(
+        0,
+        Math.round(
+          liveEta
+        )
+      );
+    }
+
+
+    /*
+     * ========================================================
+     * UPDATE ONLY THE ETA NUMBERS
+     * ========================================================
+     *
+     * This function runs every second.
+     *
+     * It does NOT contact Firebase.
+     * It does NOT use additional API requests.
+     *
+     * ========================================================
+     */
+
+    function updateEtaCountdown() {
+
+      if (
+        !window.__lastData
+      ) {
+        return;
+      }
+
+
+      const container =
+        document.getElementById(
+          'upcoming-container'
+        );
+
+      if (!container) {
+        return;
+      }
+
+
+      const rawQueue =
+        window.__lastData.upcomingTrains;
+
+
+      const queue =
+        Array.isArray(rawQueue)
+          ? rawQueue
+          : (
+              rawQueue &&
+              typeof rawQueue === 'object'
+                ? Object.values(rawQueue)
+                : []
+            );
+
+
+      if (
+        queue.length === 0
+      ) {
+        return;
+      }
+
+
+      const etaElements =
+        container.querySelectorAll(
+          '[data-eta-index]'
+        );
+
+
+      etaElements.forEach(
+        (element) => {
+
+          const index =
+            Number(
+              element.dataset.etaIndex
+            );
+
+
+          const train =
+            queue[index];
+
+
+          if (!train) {
+            return;
+          }
+
+
+          const liveEta =
+            calculateLiveEtaMinutes(
+              train.etaMinutes,
+              window.__etaReferenceTime
+            );
+
+
+          if (
+            liveEta === null
+          ) {
+            return;
+          }
+
+
+          element.innerText =
+            liveEta + 'm';
+
+
+          /*
+           * Visual urgency
+           */
+
+          element.classList.remove(
+            'urgent',
+            'arriving'
+          );
+
+
+          if (
+            liveEta <= 2
+          ) {
+
+            element.classList.add(
+              'arriving'
+            );
+
+          } else if (
+            liveEta <= 5
+          ) {
+
+            element.classList.add(
+              'urgent'
+            );
+          }
+
+
+          const sub =
+            element.parentElement
+              ?.querySelector(
+                '.eta-sub'
+              );
+
+
+          if (!sub) {
+            return;
+          }
+
+
+          const isTe =
+            document.body.classList.contains(
+              'lang-te'
+            );
+
+          const isHi =
+            document.body.classList.contains(
+              'lang-hi'
+            );
+
+
+          if (isTe) {
+
+            sub.innerText =
+              liveEta +
+              ' నిమిషాల్లో';
+
+          } else if (isHi) {
+
+            sub.innerText =
+              liveEta +
+              ' मिनट में';
+
+          } else {
+
+            sub.innerText =
+              'in ' +
+              liveEta +
+              ' mins';
+          }
+
+        }
+      );
+    }
+
+
+    /*
+     * Run countdown every second.
+     */
+
+    setInterval(
+      updateEtaCountdown,
+      1000
+    );
+
+
+    /* =====================================================
        RENDER LIVE FIREBASE DATA
-       ========================================================= */
+       ===================================================== */
 
     function renderLiveUI(data) {
 
@@ -2280,6 +2518,16 @@
 
       window.__lastData =
         data;
+
+
+      /*
+       * Save exact moment represented by Firebase data.
+       */
+
+      window.__etaReferenceTime =
+        getFirebaseSyncTime(
+          data
+        );
 
 
       const isTe =
@@ -2403,14 +2651,11 @@
       }
 
 
-      /* =====================================================
-         CENTER STOP SYMBOL — CHENNAI
-         ===================================================== */
-
       const masStopSymbol =
         document.getElementById(
           'mas-gate-stop-symbol'
         );
+
 
       if (masStopSymbol) {
 
@@ -2418,7 +2663,6 @@
           'active',
           masClosed
         );
-
       }
 
 
@@ -2501,6 +2745,7 @@
             mas.waitMinutes || 0
           ) + 'm';
 
+
         masWait.style.color =
           masClosed
             ? 'var(--red)'
@@ -2522,6 +2767,7 @@
         document.getElementById(
           'tpty-lamp-red'
         );
+
 
       const tptyGreen =
         document.getElementById(
@@ -2558,6 +2804,7 @@
           'tpty-arm-left'
         );
 
+
       const tptyRight =
         document.getElementById(
           'tpty-arm-right'
@@ -2588,14 +2835,11 @@
       }
 
 
-      /* =====================================================
-         CENTER STOP SYMBOL — TIRUPATI
-         ===================================================== */
-
       const tptyStopSymbol =
         document.getElementById(
           'tpty-gate-stop-symbol'
         );
+
 
       if (tptyStopSymbol) {
 
@@ -2603,7 +2847,6 @@
           'active',
           tptyClosed
         );
-
       }
 
 
@@ -2686,6 +2929,7 @@
             tpty.waitMinutes || 0
           ) + 'm';
 
+
         tptyWait.style.color =
           tptyClosed
             ? 'var(--red)'
@@ -2702,15 +2946,18 @@
           'decision-card'
         );
 
+
       const statusBadge =
         document.getElementById(
           'decision-status'
         );
 
+
       const title =
         document.getElementById(
           'decision-title'
         );
+
 
       const text =
         document.getElementById(
@@ -2728,9 +2975,17 @@
       }
 
 
-      /* =====================================================
-         CHENNAI CLOSED
-         ===================================================== */
+      const masActiveTrain =
+        safeText(
+          mas.activeTrain
+        );
+
+
+      const tptyActiveTrain =
+        safeText(
+          tpty.activeTrain
+        );
+
 
       if (
         masClosed &&
@@ -2775,11 +3030,6 @@
               );
       }
 
-
-      /* =====================================================
-         TIRUPATI CLOSED
-         ===================================================== */
-
       else if (
         tptyClosed &&
         !masClosed
@@ -2823,11 +3073,6 @@
               );
       }
 
-
-      /* =====================================================
-         BOTH CLOSED
-         ===================================================== */
-
       else if (
         masClosed &&
         tptyClosed
@@ -2866,15 +3111,10 @@
             ? 'రెండు వైపులా రైళ్లు వస్తున్నాయి. దయచేసి వేచి ఉండండి.'
             : (
                 isHi
-                  ? 'दोनों दिशाओं से ट्रेनें आ रही हैं। कृपया प्रतीक्षा करें।'
+                  ? 'दोनों दिशाओं से ट्रेनें आ रही हैं। कृपया प्रतीक्षा करें.'
                   : 'Multiple trains crossing Gudur Junction. Expect delays.'
               );
       }
-
-
-      /* =====================================================
-         BOTH OPEN
-         ===================================================== */
 
       else {
 
@@ -2958,11 +3198,11 @@
 
             ${
               isTe
-                ? '📍 50 కి.మీ పరిధిలో ధృవీకరించబడిన సమీప రైళ్లు లేవు.'
+                ? '📍 ధృవీకరించబడిన సమీప రైళ్లు లేవు.'
                 : (
                     isHi
-                      ? '📍 50 किमी के अंदर कोई सत्यापित ट्रेन नहीं है।'
-                      : '📍 No verified approaching trains within 50 km.'
+                      ? '📍 कोई सत्यापित आने वाली ट्रेन नहीं है.'
+                      : '📍 No verified approaching trains.'
                   )
             }
 
@@ -2974,9 +3214,11 @@
       }
 
 
-      /* =====================================================
-         SORT BY ETA
-         ===================================================== */
+      /*
+       * Sort by original ETA.
+       *
+       * The countdown itself is calculated every second.
+       */
 
       const sortedQueue =
         [...queue]
@@ -2991,14 +3233,10 @@
           );
 
 
-      /* =====================================================
-         RENDER QUEUE
-         ===================================================== */
-
       container.innerHTML =
         sortedQueue
           .map(
-            t => {
+            (t, index) => {
 
               const trainNo =
                 safeText(
@@ -3026,7 +3264,9 @@
                 Number.isFinite(eta)
                   ? Math.max(
                       0,
-                      Math.round(eta)
+                      Math.round(
+                        eta
+                      )
                     )
                   : '--';
 
@@ -3043,10 +3283,6 @@
                   : 'On Time';
 
 
-              /* =================================================
-                 CORRIDOR
-                 ================================================= */
-
               const corridor =
                 safeText(
                   t.corridor
@@ -3060,17 +3296,6 @@
               const isTpty =
                 corridor === 'TPTY';
 
-
-              /*
-               * IMPORTANT:
-               *
-               * MAS  -> MAS LINE
-               * TPTY -> TPTY LINE
-               * OTHER -> OTHER LINE
-               *
-               * Do NOT treat every non-MAS train
-               * as TPTY.
-               */
 
               const corridorLabel =
                 isMas
@@ -3112,7 +3337,6 @@
 
                     </div>
 
-
                     <div class="train-sub">
 
                       <span
@@ -3123,11 +3347,9 @@
 
                       </span>
 
-
                       <span>
                         • PF ${escapeHtml(platform)}
                       </span>
-
 
                       <span>
                         • ${escapeHtml(delayText)}
@@ -3137,10 +3359,12 @@
 
                   </div>
 
-
                   <div class="eta-col">
 
-                    <div class="eta-min">
+                    <div
+                      class="eta-min"
+                      data-eta-index="${index}"
+                    >
                       ${safeEta}m
                     </div>
 
@@ -3166,6 +3390,13 @@
             }
           )
           .join('');
+
+
+      /*
+       * Immediately calculate the first countdown value.
+       */
+
+      updateEtaCountdown();
 
     }
 
@@ -3201,7 +3432,7 @@
 
 
     /* =========================================================
-       LOAD SAVED LANGUAGE
+       LOAD LANGUAGE
        ========================================================= */
 
     document.addEventListener(
@@ -3289,6 +3520,7 @@
 
 
             renderLiveUI({
+
               chennaiGate: {
                 status: 'OPEN',
                 waitMinutes: 0,
@@ -3303,7 +3535,9 @@
 
               upcomingTrains: [],
 
-              lastUpdated: 'No live data'
+              lastUpdated:
+                'No live data'
+
             });
 
 
