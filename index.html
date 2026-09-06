@@ -996,6 +996,13 @@
       color: #fbbf24;
     }
 
+    /* OTHER / UNCLASSIFIED CORRIDOR */
+    .corridor-other {
+      background: rgba(148, 163, 184, 0.18);
+
+      color: #94a3b8;
+    }
+
     .eta-col {
       text-align: right;
 
@@ -1474,7 +1481,6 @@
           id="mas-arm-right"
         ></div>
 
-        <!-- CENTER STOP SYMBOL -->
         <div
           class="gate-stop-symbol"
           id="mas-gate-stop-symbol"
@@ -1616,7 +1622,6 @@
           id="tpty-arm-right"
         ></div>
 
-        <!-- CENTER STOP SYMBOL -->
         <div
           class="gate-stop-symbol"
           id="tpty-gate-stop-symbol"
@@ -3038,6 +3043,10 @@
                   : 'On Time';
 
 
+              /* =================================================
+                 CORRIDOR
+                 ================================================= */
+
               const corridor =
                 safeText(
                   t.corridor
@@ -3046,6 +3055,41 @@
 
               const isMas =
                 corridor === 'MAS';
+
+
+              const isTpty =
+                corridor === 'TPTY';
+
+
+              /*
+               * IMPORTANT:
+               *
+               * MAS  -> MAS LINE
+               * TPTY -> TPTY LINE
+               * OTHER -> OTHER LINE
+               *
+               * Do NOT treat every non-MAS train
+               * as TPTY.
+               */
+
+              const corridorLabel =
+                isMas
+                  ? 'MAS LINE'
+                  : (
+                      isTpty
+                        ? 'TPTY LINE'
+                        : 'OTHER LINE'
+                    );
+
+
+              const corridorClass =
+                isMas
+                  ? 'corridor-mas'
+                  : (
+                      isTpty
+                        ? 'corridor-tpty'
+                        : 'corridor-other'
+                    );
 
 
               const platform =
@@ -3072,18 +3116,10 @@
                     <div class="train-sub">
 
                       <span
-                        class="corridor-pill ${
-                          isMas
-                            ? 'corridor-mas'
-                            : 'corridor-tpty'
-                        }"
+                        class="corridor-pill ${corridorClass}"
                       >
 
-                        ${
-                          isMas
-                            ? 'MAS LINE'
-                            : 'TPTY LINE'
-                        }
+                        ${corridorLabel}
 
                       </span>
 

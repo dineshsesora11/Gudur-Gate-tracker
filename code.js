@@ -58,7 +58,7 @@ const gateRef = db.ref("gudur_gates");
 
 // API key supplied by the user
 const RAILRADAR_API_KEY =
-  "rg_142aad0a449a42618d75f24a1d4e0669";
+  "rg_87cecff7f86c476f9163db7c476a00b2";
 
 const RAILRADAR_BASE_URL =
   "https://api.railradar.in/v1";
