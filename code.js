@@ -15,6 +15,11 @@ const fs = require("fs");
 //
 // Gate closure requires ACTUAL LIVE GPS.
 // Route interpolation is used only for display/ETA.
+//
+// TEMPORARY DIAGNOSTIC:
+// Train 20625 is forced into the 7 live verifications when
+// present in the station board, so its raw RailRadar response
+// can be inspected.
 // ============================================================
 
 
@@ -656,7 +661,6 @@ function findGudurRouteIndex(
 //
 // currentLocation.sequence
 //
-// ============================================================
 
 function getCurrentLocation(
   liveResponse
@@ -1360,7 +1364,6 @@ function getDistanceToGudur(
   ) {
     return null;
   }
-
 
   return haversineKm(
     position.lat,
@@ -2482,6 +2485,52 @@ async function updateGateSystem() {
       );
 
 
+    // ========================================================
+    // TEMPORARY DIAGNOSTIC PRIORITY
+    // ========================================================
+    //
+    // Force train 20625 into the 7 live verifications when
+    // it exists in the station-board candidate list.
+    //
+    // This does NOT change gate safety rules.
+    // It only makes sure we receive the raw response for 20625.
+    //
+    // ========================================================
+
+    const diagnosticIndex =
+      boardCandidates.findIndex(
+        (candidate) =>
+          getTrainNumber(
+            candidate.item
+          ) === "20625"
+      );
+
+
+    if (
+      diagnosticIndex >= 0 &&
+      verificationLimit > 0 &&
+      diagnosticIndex >= verificationLimit
+    ) {
+      const diagnosticCandidate =
+        boardCandidates.splice(
+          diagnosticIndex,
+          1
+        )[0];
+
+
+      boardCandidates.splice(
+        verificationLimit - 1,
+        0,
+        diagnosticCandidate
+      );
+
+
+      console.log(
+        "\n[DIAGNOSTIC] Train 20625 moved into live verification slot."
+      );
+    }
+
+
     console.log(
       `Prioritizing ${verificationLimit} closest/most urgent trains.`
     );
@@ -2546,9 +2595,6 @@ async function updateGateSystem() {
         // ======================================================
         //
         // Print the complete RailRadar response for train 20625.
-        //
-        // This is temporary and will help determine why GPS
-        // coordinates are not currently being extracted.
         //
         // ======================================================
 
