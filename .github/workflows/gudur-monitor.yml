@@ -1,19 +1,14 @@
-name: Gudur Gate Live Monitor
+name: Gudur Gate Monitor
 
 on:
-  workflow_dispatch:
-
   schedule:
     - cron: "*/5 * * * *"
 
-concurrency:
-  group: gudur-gate-live-monitor
-  cancel-in-progress: true
+  workflow_dispatch:
 
 jobs:
   monitor:
     runs-on: ubuntu-latest
-
     timeout-minutes: 1
 
     steps:
@@ -23,15 +18,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: npm
+          node-version: 20
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
-      - name: Run Gudur Gate monitor
-        env:
-          RAILRADAR_API_KEY: ${{ secrets.RAILRADAR_API_KEY }}
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          GITHUB_ACTIONS: "true"
+      - name: Run Gudur Gate Monitor
         run: node code.js
