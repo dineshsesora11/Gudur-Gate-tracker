@@ -9,7 +9,7 @@ on:
 jobs:
   monitor:
     runs-on: ubuntu-latest
-    timeout-minutes: 1
+    timeout-minutes: 2
 
     steps:
       - name: Checkout repository
@@ -26,4 +26,5 @@ jobs:
       - name: Run Gudur Gate Monitor
         env:
           RAILRADAR_API_KEY: ${{ secrets.RAILRADAR_API_KEY }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: node code.js
