@@ -1164,10 +1164,6 @@
 
   <div class="app">
 
-    <!-- =====================================================
-         HEADER
-         ===================================================== -->
-
     <header class="hud-header">
 
       <div class="title-block">
@@ -1242,10 +1238,6 @@
     </header>
 
 
-    <!-- =====================================================
-         ADVISORY
-         ===================================================== -->
-
     <div
       class="decision-hub"
       id="decision-card"
@@ -1314,10 +1306,6 @@
 
     </div>
 
-
-    <!-- =====================================================
-         CHENNAI GATE
-         ===================================================== -->
 
     <div class="gate-card">
 
@@ -1451,10 +1439,6 @@
     </div>
 
 
-    <!-- =====================================================
-         TIRUPATI GATE
-         ===================================================== -->
-
     <div class="gate-card">
 
       <div class="gate-primary">
@@ -1587,10 +1571,6 @@
     </div>
 
 
-    <!-- =====================================================
-         UPCOMING TRAINS
-         ===================================================== -->
-
     <details
       class="upcoming-wrapper"
       id="upcoming-accordion"
@@ -1657,10 +1637,6 @@
 
     </details>
 
-
-    <!-- =====================================================
-         SAFETY PANEL
-         ===================================================== -->
 
     <div class="safety-panel">
 
@@ -1891,10 +1867,6 @@
     </div>
 
 
-    <!-- =====================================================
-         FOOTER
-         ===================================================== -->
-
     <footer>
 
       <span>
@@ -1917,10 +1889,6 @@
 
   </div>
 
-
-  <!-- =======================================================
-       THEME SYSTEM
-       ======================================================= -->
 
   <script>
 
@@ -2003,6 +1971,7 @@
         document.body.classList.add(
           'light-mode'
         );
+
       }
 
     })();
@@ -2026,10 +1995,6 @@
 
   </script>
 
-
-  <!-- =======================================================
-       LANGUAGE + LIVE UI
-       ======================================================= -->
 
   <script>
 
@@ -2128,33 +2093,30 @@
 
     /*
      * ========================================================
-     * ETA COUNTDOWN SYSTEM
+     * CONTINUOUS ETA COUNTDOWN
      * ========================================================
      *
-     * Firebase may say:
+     * Firebase gives the authoritative ETA.
      *
-     *     etaMinutes: 10
+     * The phone calculates the elapsed time locally.
      *
-     * That does NOT mean the page should permanently display
-     * 10m.
+     * Therefore:
      *
-     * We store the Firebase sync time and subtract the amount
-     * of real time that has passed since that sync.
+     * GitHub update: 10m
      *
-     * Example:
+     * Phone:
      *
-     * Firebase update:
+     * 10m
+     * 9m
+     * 8m
+     * 7m
+     * ...
      *
-     *     ETA = 10 minutes
+     * without waiting for GitHub.
      *
-     * 2 minutes later:
+     * This DOES NOT make the backend update faster.
      *
-     *     Page shows 8 minutes
-     *
-     * This updates every second.
-     *
-     * The GitHub monitor still provides the authoritative
-     * refreshed train position every cycle.
+     * It only keeps the display moving continuously.
      *
      * ========================================================
      */
@@ -2163,16 +2125,6 @@
 
 
     function getFirebaseSyncTime(data) {
-
-      /*
-       * Best option:
-       *
-       * backend can provide:
-       *
-       * lastUpdatedAt
-       *
-       * as an ISO timestamp.
-       */
 
       if (
         data &&
@@ -2193,13 +2145,6 @@
       }
 
 
-      /*
-       * Second option:
-       *
-       * lastUpdatedLocal
-       *
-       */
-
       if (
         data &&
         data.lastUpdatedLocal
@@ -2218,16 +2163,6 @@
         }
       }
 
-
-      /*
-       * Last fallback:
-       *
-       * When backend only gives a clock string such as:
-       *
-       * 5:15:31 PM
-       *
-       * convert it to today's local date.
-       */
 
       if (
         data &&
@@ -2258,12 +2193,6 @@
       }
 
 
-      /*
-       * If no usable timestamp exists,
-       * use the moment Firebase delivered
-       * this data.
-       */
-
       return Date.now();
     }
 
@@ -2285,13 +2214,16 @@
         return null;
       }
 
+
       if (
-        !referenceTime
+        !Number.isFinite(
+          referenceTime
+        )
       ) {
 
         return Math.max(
           0,
-          Math.round(eta)
+          Math.ceil(eta)
         );
       }
 
@@ -2300,23 +2232,30 @@
         Date.now() -
         referenceTime;
 
+
       const elapsedMinutes =
         elapsedMs / 60000;
 
-
-      /*
-       * Keep the original ETA precision internally,
-       * but display whole minutes.
-       */
 
       const liveEta =
         eta -
         elapsedMinutes;
 
 
+      /*
+       * CEIL is used so:
+       *
+       * 4.99 = 5m
+       * 4.01 = 5m
+       * 4.00 = 4m
+       *
+       * This prevents the countdown from dropping
+       * one minute too early.
+       */
+
       return Math.max(
         0,
-        Math.round(
+        Math.ceil(
           liveEta
         )
       );
@@ -2325,14 +2264,7 @@
 
     /*
      * ========================================================
-     * UPDATE ONLY THE ETA NUMBERS
-     * ========================================================
-     *
-     * This function runs every second.
-     *
-     * It does NOT contact Firebase.
-     * It does NOT use additional API requests.
-     *
+     * UPDATE ETA EVERY SECOND
      * ========================================================
      */
 
@@ -2349,6 +2281,7 @@
         document.getElementById(
           'upcoming-container'
         );
+
 
       if (!container) {
         return;
@@ -2419,10 +2352,6 @@
             liveEta + 'm';
 
 
-          /*
-           * Visual urgency
-           */
-
           element.classList.remove(
             'urgent',
             'arriving'
@@ -2464,6 +2393,7 @@
               'lang-te'
             );
 
+
           const isHi =
             document.body.classList.contains(
               'lang-hi'
@@ -2496,7 +2426,7 @@
 
 
     /*
-     * Run countdown every second.
+     * Run every second.
      */
 
     setInterval(
@@ -2520,10 +2450,6 @@
         data;
 
 
-      /*
-       * Save exact moment represented by Firebase data.
-       */
-
       window.__etaReferenceTime =
         getFirebaseSyncTime(
           data
@@ -2534,6 +2460,7 @@
         document.body.classList.contains(
           'lang-te'
         );
+
 
       const isHi =
         document.body.classList.contains(
@@ -2550,10 +2477,6 @@
                 : 'Tracks Clear'
             );
 
-
-      /* =====================================================
-         DEFAULT GATE DATA
-         ===================================================== */
 
       const mas =
         data.chennaiGate || {
@@ -2585,6 +2508,7 @@
         document.getElementById(
           'mas-lamp-red'
         );
+
 
       const masGreen =
         document.getElementById(
@@ -2620,6 +2544,7 @@
         document.getElementById(
           'mas-arm-left'
         );
+
 
       const masRight =
         document.getElementById(
@@ -2975,13 +2900,13 @@
       }
 
 
-      const masActiveTrain =
+      const masActive =
         safeText(
           mas.activeTrain
         );
 
 
-      const tptyActiveTrain =
+      const tptyActive =
         safeText(
           tpty.activeTrain
         );
@@ -3022,11 +2947,11 @@
 
         text.innerText =
           isTe
-            ? `చెన్నై లైన్‌లో రైలు (${masActiveTrain}) వస్తోంది. తిరుపతి గేట్ రూట్ తీసుకోండి.`
+            ? `చెన్నై లైన్‌లో రైలు (${masActive}) వస్తోంది. తిరుపతి గేట్ రూట్ తీసుకోండి.`
             : (
                 isHi
-                  ? `चेन्नई लाइन पर ट्रेन (${masActiveTrain}) आ रही है। तिरुपति फाटक मार्ग अपनाएं।`
-                  : `Train approaching on Chennai line (${masActiveTrain}). Use Tirupati crossing.`
+                  ? `चेन्नई लाइन पर ट्रेन (${masActive}) आ रही है। तिरुपति फाटक मार्ग अपनाएं।`
+                  : `Train approaching on Chennai line (${masActive}). Use Tirupati crossing.`
               );
       }
 
@@ -3065,11 +2990,11 @@
 
         text.innerText =
           isTe
-            ? `తిరుపతి లైన్‌లో రైలు (${tptyActiveTrain}) వస్తోంది. చెన్నై మెయిన్ గేట్ ప్రస్తుతం తెరిచి ఉంది.`
+            ? `తిరుపతి లైన్‌లో రైలు (${tptyActive}) వస్తోంది. చెన్నై మెయిన్ గేట్ ప్రస్తుతం తెరిచి ఉంది.`
             : (
                 isHi
-                  ? `तिरुपति मार्ग पर ट्रेन (${tptyActiveTrain}) आ रही है। चेन्नई मुख्य फाटक खुला है।`
-                  : `Tirupati crossing halted by ${tptyActiveTrain}. Chennai mainline is clear.`
+                  ? `तिरुपति मार्ग पर ट्रेन (${tptyActive}) आ रही है। चेन्नई मुख्य फाटक खुला है।`
+                  : `Tirupati crossing halted by ${tptyActive}. Chennai mainline is clear.`
               );
       }
 
@@ -3158,7 +3083,7 @@
 
 
       /* =====================================================
-         UPCOMING QUEUE
+         UPCOMING TRAINS
          ===================================================== */
 
       const container =
@@ -3215,9 +3140,12 @@
 
 
       /*
-       * Sort by original ETA.
+       * IMPORTANT:
        *
-       * The countdown itself is calculated every second.
+       * Keep the original queue order from Firebase.
+       *
+       * This ensures the data-eta-index used by the
+       * one-second countdown points to the correct train.
        */
 
       const sortedQueue =
@@ -3225,12 +3153,22 @@
           .sort(
             (a, b) =>
               Number(
-                a.etaMinutes || 9999
+                a.etaMinutes ?? 9999
               ) -
               Number(
-                b.etaMinutes || 9999
+                b.etaMinutes ?? 9999
               )
           );
+
+
+      /*
+       * Save the queue actually being displayed.
+       *
+       * The countdown will use this same sorted queue.
+       */
+
+      window.__displayQueue =
+        sortedQueue;
 
 
       container.innerHTML =
@@ -3264,7 +3202,7 @@
                 Number.isFinite(eta)
                   ? Math.max(
                       0,
-                      Math.round(
+                      Math.ceil(
                         eta
                       )
                     )
@@ -3392,18 +3330,10 @@
           .join('');
 
 
-      /*
-       * Immediately calculate the first countdown value.
-       */
-
       updateEtaCountdown();
 
     }
 
-
-    /* =========================================================
-       HTML ESCAPE
-       ========================================================= */
 
     function escapeHtml(value) {
 
@@ -3431,10 +3361,6 @@
     }
 
 
-    /* =========================================================
-       LOAD LANGUAGE
-       ========================================================= */
-
     document.addEventListener(
       'DOMContentLoaded',
       function () {
@@ -3460,6 +3386,7 @@
           setAppLanguage(
             'en'
           );
+
         }
 
       }
@@ -3467,10 +3394,6 @@
 
   </script>
 
-
-  <!-- =======================================================
-       FIREBASE
-       ======================================================= -->
 
   <script
     src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"
@@ -3551,6 +3474,7 @@
 
               syncElem.innerText =
                 'No data';
+
             }
 
 
@@ -3573,7 +3497,9 @@
 
             syncElem.innerText =
               val.lastUpdated ||
+              val.lastUpdatedLocal ||
               'Live';
+
           }
 
         },
@@ -3596,9 +3522,11 @@
 
             syncElem.innerText =
               'Connection error';
+
           }
 
         }
+
       );
 
 
@@ -3620,6 +3548,7 @@
 
         syncElem.innerText =
           'Firebase error';
+
       }
 
     }
