@@ -1,3 +1,4 @@
+```js
 const axios = require("axios");
 const admin = require("firebase-admin");
 const fs = require("fs");
@@ -673,16 +674,6 @@ function getCurrentLocation(
 // ============================================================
 // GET ROUTE DIRECTION
 // ============================================================
-//
-// Uses:
-//
-// currentLocation.sequence
-//
-// compared with:
-//
-// Gudur route sequence.
-//
-// ============================================================
 
 function getRouteDirection(
   liveResponse
@@ -1145,19 +1136,6 @@ function extractRouteStopPosition(
 // ============================================================
 // INTERPOLATED ROUTE POSITION
 // ============================================================
-//
-// Uses:
-//
-// sequence
-// segmentProgress
-//
-// to estimate the train position between stations.
-//
-// IMPORTANT:
-// isActualPosition = false.
-//
-// Therefore it can NEVER close a gate.
-//
 
 function extractInterpolatedRoutePosition(
   liveResponse
@@ -1637,20 +1615,6 @@ function getBoardDepartureTime(
 // ============================================================
 // MERGE LIVE RESPONSE
 // ============================================================
-//
-// IMPORTANT:
-//
-// Preserve RailRadar fields:
-//
-// currentLocation
-// previousHalt
-// nextHalt
-// route
-// delayMinutes
-// isLive
-// status
-//
-// ============================================================
 
 function mergeVerifiedData(
   boardItem,
@@ -1902,16 +1866,6 @@ function shouldShowUpcoming(
 
 // ============================================================
 // SHOULD CLOSE GATE
-// ============================================================
-//
-// SAFETY REQUIREMENTS:
-//
-// 1. TOWARD_GUDUR
-// 2. MAS or TPTY
-// 3. LIVE GPS
-// 4. isActualPosition === true
-// 5. Within 0.6 km of correct gate
-//
 // ============================================================
 
 function shouldCloseGate(
@@ -2588,6 +2542,38 @@ async function updateGateSystem() {
         );
 
 
+        // ======================================================
+        // TEMPORARY RAW RAILRADAR DIAGNOSTIC
+        // ======================================================
+        //
+        // Print the complete RailRadar response for train 20625.
+        //
+        // This is temporary and will help determine why GPS
+        // coordinates are not currently being extracted.
+        //
+        // ======================================================
+
+        if (
+          trainNumber === "20625"
+        ) {
+          console.log(
+            "\n========== RAW RAILRADAR 20625 =========="
+          );
+
+          console.log(
+            JSON.stringify(
+              liveResponse,
+              null,
+              2
+            )
+          );
+
+          console.log(
+            "========== END RAW 20625 ==========\n"
+          );
+        }
+
+
         if (
           processed.direction !==
           "TOWARD_GUDUR"
@@ -2670,7 +2656,7 @@ async function updateGateSystem() {
             train.corridor,
 
           direction:
-            "TOWARD GUDUR",
+            "TOWARD_GUDUR",
 
           platform:
             train.platform
@@ -2749,8 +2735,7 @@ async function updateGateSystem() {
       (a, b) =>
         (
           a.etaMinutes || 0
-        ) -
-        (
+        ) - (
           b.etaMinutes || 0
         )
     );
@@ -3032,13 +3017,6 @@ console.log(
 // ============================================================
 // GITHUB ACTIONS / LOCAL MODE
 // ============================================================
-//
-// GitHub Actions:
-//   Run one cycle -> exit.
-//
-// Local computer:
-//   Run immediately -> repeat every 60 seconds.
-//
 
 if (
   process.env.GITHUB_ACTIONS
@@ -3085,3 +3063,4 @@ if (
     REFRESH_INTERVAL_MS
   );
 }
+```
