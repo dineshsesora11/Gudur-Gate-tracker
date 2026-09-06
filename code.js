@@ -1,4 +1,3 @@
-```js
 const axios = require("axios");
 const admin = require("firebase-admin");
 const fs = require("fs");
@@ -3063,4 +3062,3 @@ if (
     REFRESH_INTERVAL_MS
   );
 }
-```
