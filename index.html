@@ -2,14 +2,14 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
 
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  />
+  >
 
-  <title>Gudur Junction • Crossing Radar & Upcoming Trains</title>
+  <title>GDR Crossing Radar</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,38 +24,33 @@
     :root {
       --bg: #06090e;
       --surface: #0e141f;
-      --surface-elevated: #162030;
+      --surface2: #162030;
       --border: #223049;
 
       --text: #ffffff;
       --dim: #8295ab;
 
       --green: #00f076;
-      --green-glow: 0 0 16px rgba(0, 240, 118, 0.4);
-
       --red: #ff2a55;
-      --red-glow: 0 0 16px rgba(255, 42, 85, 0.5);
-
       --amber: #ffb800;
+      --blue: #38bdf8;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-
       font-family:
-        'Inter',
-        'Noto Sans Telugu',
-        'Noto Sans Devanagari',
+        Inter,
+        "Noto Sans Telugu",
+        "Noto Sans Devanagari",
         sans-serif;
     }
 
     body {
+      min-height: 100vh;
       background: var(--bg);
       color: var(--text);
-
-      min-height: 100vh;
 
       display: flex;
       justify-content: center;
@@ -63,8 +58,23 @@
       padding: 14px 12px 30px;
 
       transition:
-        background-color 0.25s ease,
-        color 0.25s ease;
+        background-color .25s ease,
+        color .25s ease;
+    }
+
+    body.light-mode {
+      --bg: #f3f6fa;
+      --surface: #ffffff;
+      --surface2: #eef3f8;
+      --border: #cbd5e1;
+
+      --text: #0f172a;
+      --dim: #64748b;
+
+      --green: #059669;
+      --red: #dc2626;
+      --amber: #d97706;
+      --blue: #0284c7;
     }
 
     .app {
@@ -76,6 +86,10 @@
 
       gap: 14px;
     }
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
 
     .hud-header {
       display: flex;
@@ -94,229 +108,117 @@
     }
 
     .title-block h1 {
-      font-family: 'Chakra Petch', sans-serif;
+      font-family: "Chakra Petch", sans-serif;
 
       font-size: 1.05rem;
       font-weight: 800;
 
-      letter-spacing: 0.04em;
+      letter-spacing: .04em;
       text-transform: uppercase;
     }
 
     .title-block p {
-      font-size: 0.72rem;
-      color: var(--dim);
-
       margin-top: 2px;
+
+      font-size: .72rem;
+      color: var(--dim);
     }
 
     .header-controls {
       display: flex;
       align-items: center;
+      justify-content: flex-end;
 
       gap: 7px;
-
       flex-wrap: wrap;
-      justify-content: flex-end;
     }
 
     .lang-switcher {
       display: flex;
 
+      padding: 2px;
+      gap: 2px;
+
       background: #020408;
 
       border: 1px solid var(--border);
       border-radius: 8px;
-
-      padding: 2px;
-      gap: 2px;
-
-      transition:
-        background-color 0.25s ease,
-        border-color 0.25s ease;
     }
 
     .lang-btn {
-      background: transparent;
       border: none;
+      background: transparent;
 
       color: var(--dim);
 
-      padding: 6px 12px;
+      padding: 6px 10px;
 
-      font-size: 0.75rem;
+      font-size: .75rem;
       font-weight: 700;
 
       border-radius: 6px;
 
       cursor: pointer;
-      user-select: none;
-
-      transition: all 0.15s ease-in-out;
     }
 
     .lang-btn.active {
-      background: var(--surface-elevated);
+      background: var(--surface2);
       color: var(--green);
-
-      box-shadow:
-        0 0 10px rgba(0, 240, 118, 0.25);
-    }
-
-    .theme-switcher {
-      display: flex;
-      align-items: center;
     }
 
     .theme-btn {
+      padding: 6px 10px;
+
       background: var(--surface);
+
       color: var(--text);
 
       border: 1px solid var(--border);
       border-radius: 8px;
 
-      padding: 6px 10px;
-
-      font-size: 0.72rem;
+      font-size: .72rem;
       font-weight: 700;
 
       cursor: pointer;
-      user-select: none;
-
-      white-space: nowrap;
-
-      transition: all 0.2s ease;
     }
 
-    .theme-btn:hover {
-      background: var(--surface-elevated);
-      transform: translateY(-1px);
+    /* =========================================================
+       LANGUAGE
+       ========================================================= */
+
+    body.lang-en .lang-te-only,
+    body.lang-en .lang-hi-only {
+      display: none !important;
     }
 
-    .theme-btn:active {
-      transform: translateY(0);
+    body.lang-te .lang-en-only,
+    body.lang-te .lang-hi-only {
+      display: none !important;
     }
 
-    body.light-mode {
-      --bg: #f3f6fa;
-      --surface: #ffffff;
-      --surface-elevated: #eef3f8;
-      --border: #cbd5e1;
-
-      --text: #0f172a;
-      --dim: #64748b;
-
-      --green: #059669;
-      --green-glow: 0 0 12px rgba(5, 150, 105, 0.25);
-
-      --red: #dc2626;
-      --red-glow: 0 0 12px rgba(220, 38, 38, 0.25);
-
-      --amber: #d97706;
+    body.lang-hi .lang-en-only,
+    body.lang-hi .lang-te-only {
+      display: none !important;
     }
 
-    body.light-mode .lang-switcher {
-      background: #e2e8f0;
-    }
-
-    body.light-mode .signal-box {
-      background: #e2e8f0;
-      border-color: #cbd5e1;
-    }
-
-    body.light-mode .crossing-graphic {
-      background: #e8eef5;
-      border-color: #cbd5e1;
-    }
-
-    body.light-mode .rail-track {
-      background:
-        repeating-linear-gradient(
-          90deg,
-          #94a3b8,
-          #94a3b8 10px,
-          transparent 10px,
-          transparent 20px
-        );
-
-      border-top-color: #64748b;
-      border-bottom-color: #64748b;
-    }
-
-    body.light-mode .gate-post {
-      background: #64748b;
-      border-color: #475569;
-    }
-
-    body.light-mode .gate-readouts {
-      border-top-color: #cbd5e1;
-    }
-
-    body.light-mode .upcoming-item {
-      background: rgba(15, 23, 42, 0.035);
-      border-color: rgba(15, 23, 42, 0.08);
-    }
-
-    body.light-mode .upcoming-body,
-    body.light-mode .safety-header {
-      border-color: #cbd5e1;
-    }
-
-    body.light-mode .train-head {
-      color: #0f172a;
-    }
-
-    body.light-mode .train-info-val {
-      color: #1e293b;
-    }
-
-    body.light-mode .safety-item {
-      color: #334155;
-    }
-
-    body.light-mode .route-desc {
-      color: #475569;
-    }
-
-    body.light-mode footer {
-      color: #64748b;
-    }
-
-    body.light-mode #sync-stamp {
-      color: #475569 !important;
-    }
-
-    body,
-    .hud-header,
-    .gate-card,
-    .decision-hub,
-    .upcoming-wrapper,
-    .safety-panel,
-    .upcoming-summary,
-    .theme-btn,
-    .lang-switcher,
-    .signal-box,
-    .crossing-graphic {
-      transition:
-        background-color 0.25s ease,
-        color 0.25s ease,
-        border-color 0.25s ease;
-    }
+    /* =========================================================
+       DECISION / ADVISORY
+       ========================================================= */
 
     .decision-hub {
       padding: 14px;
 
-      background: var(--surface-elevated);
+      background: var(--surface2);
+
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--green);
 
       border-radius: 12px;
-      border: 1px solid var(--border);
 
       display: flex;
       flex-direction: column;
 
       gap: 8px;
-
-      border-left: 4px solid var(--green);
     }
 
     .decision-hub.warning {
@@ -334,12 +236,12 @@
     }
 
     .decision-label {
-      font-family: 'Chakra Petch', sans-serif;
+      font-family: "Chakra Petch", sans-serif;
 
-      font-size: 0.72rem;
+      font-size: .72rem;
       font-weight: 800;
 
-      letter-spacing: 0.08em;
+      letter-spacing: .08em;
       text-transform: uppercase;
 
       color: var(--dim);
@@ -348,16 +250,17 @@
     .route-action {
       font-size: 1.05rem;
       font-weight: 700;
-
-      color: var(--text);
     }
 
     .route-desc {
-      font-size: 0.82rem;
-
       color: #9cb0c8;
 
-      line-height: 1.4;
+      font-size: .82rem;
+      line-height: 1.45;
+    }
+
+    body.light-mode .route-desc {
+      color: #475569;
     }
 
     .maps-btn {
@@ -365,23 +268,22 @@
 
       margin-top: 4px;
 
-      display: inline-flex;
-      align-items: center;
-
-      gap: 6px;
+      padding: 6px 12px;
 
       background: #ffffff;
       color: #000000;
 
-      padding: 6px 12px;
-
       border-radius: 6px;
 
-      font-size: 0.75rem;
+      font-size: .75rem;
       font-weight: 700;
 
       text-decoration: none;
     }
+
+    /* =========================================================
+       GATE CARD
+       ========================================================= */
 
     .gate-card {
       background: var(--surface);
@@ -399,6 +301,7 @@
 
     .gate-primary {
       display: flex;
+
       justify-content: space-between;
       align-items: center;
 
@@ -416,10 +319,11 @@
     }
 
     .gate-sub {
-      font-size: 0.74rem;
+      margin-top: 2px;
+
       color: var(--dim);
 
-      margin-top: 2px;
+      font-size: .74rem;
     }
 
     .gate-controls {
@@ -427,86 +331,107 @@
       align-items: center;
 
       gap: 8px;
-
       flex-shrink: 0;
     }
 
+    /* =========================================================
+       STATUS
+       ========================================================= */
+
     .gate-status {
-      display: inline-flex;
-
-      align-items: center;
-      justify-content: center;
-
-      min-width: 58px;
+      min-width: 62px;
 
       padding: 5px 8px;
 
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+
       border-radius: 6px;
 
-      font-family: 'Chakra Petch', sans-serif;
+      font-family: "Chakra Petch", sans-serif;
 
-      font-size: 0.72rem;
+      font-size: .72rem;
       font-weight: 800;
 
-      letter-spacing: 0.06em;
+      letter-spacing: .06em;
 
       border: 1px solid;
-
-      transition:
-        background-color 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
     }
 
     .gate-status.go {
       color: var(--green);
 
-      background: rgba(0, 240, 118, 0.10);
+      background: rgba(0,240,118,.10);
 
-      border-color: rgba(0, 240, 118, 0.35);
+      border-color: rgba(0,240,118,.35);
 
       box-shadow:
-        0 0 10px rgba(0, 240, 118, 0.12);
+        0 0 10px rgba(0,240,118,.12);
+    }
+
+    .gate-status.warning {
+      color: var(--amber);
+
+      background: rgba(255,184,0,.12);
+
+      border-color: rgba(255,184,0,.45);
+
+      box-shadow:
+        0 0 14px rgba(255,184,0,.20);
+
+      animation:
+        warningPulse 1.1s ease-in-out infinite;
     }
 
     .gate-status.stop {
       color: var(--red);
 
-      background: rgba(255, 42, 85, 0.10);
+      background: rgba(255,42,85,.10);
 
-      border-color: rgba(255, 42, 85, 0.40);
+      border-color: rgba(255,42,85,.40);
 
       box-shadow:
-        0 0 12px rgba(255, 42, 85, 0.18);
+        0 0 14px rgba(255,42,85,.22);
 
       animation:
-        stopPulse 1.5s ease-in-out infinite;
+        stopPulse 1s ease-in-out infinite;
     }
 
-    @keyframes stopPulse {
-      0%,
-      100% {
+    @keyframes warningPulse {
+      0%,100% {
         opacity: 1;
       }
 
       50% {
-        opacity: 0.65;
+        opacity: .55;
       }
     }
 
+    @keyframes stopPulse {
+      0%,100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: .55;
+      }
+    }
+
+    /* =========================================================
+       SIGNAL
+       ========================================================= */
+
     .signal-box {
       display: flex;
-
       gap: 6px;
-
-      background: #000;
 
       padding: 4px 6px;
 
-      border-radius: 20px;
+      background: #000;
 
       border: 1px solid #1a2538;
+      border-radius: 20px;
     }
 
     .lamp {
@@ -517,7 +442,7 @@
 
       background: #1c2430;
 
-      opacity: 0.2;
+      opacity: .2;
     }
 
     .lamp.red-on {
@@ -526,7 +451,7 @@
       opacity: 1;
 
       box-shadow:
-        var(--red-glow);
+        0 0 16px rgba(255,42,85,.5);
     }
 
     .lamp.green-on {
@@ -535,25 +460,46 @@
       opacity: 1;
 
       box-shadow:
-        var(--green-glow);
+        0 0 16px rgba(0,240,118,.4);
     }
+
+    .lamp.amber-on {
+      background: var(--amber);
+
+      opacity: 1;
+
+      box-shadow:
+        0 0 16px rgba(255,184,0,.45);
+
+      animation:
+        warningPulse 1s ease-in-out infinite;
+    }
+
+    /* =========================================================
+       CROSSING GRAPHIC
+       ========================================================= */
 
     .crossing-graphic {
       height: 46px;
 
-      background: #070b12;
-
-      border: 1px solid #1a2436;
-      border-radius: 8px;
-
       position: relative;
+
+      overflow: hidden;
 
       display: flex;
       align-items: center;
 
       padding: 0 10px;
 
-      overflow: hidden;
+      background: #070b12;
+
+      border: 1px solid #1a2436;
+      border-radius: 8px;
+    }
+
+    body.light-mode .crossing-graphic {
+      background: #e8eef5;
+      border-color: #cbd5e1;
     }
 
     .rail-track {
@@ -603,9 +549,10 @@
     .barrier-arm {
       position: absolute;
 
+      width: calc(50% - 14px);
       height: 6px;
 
-      width: calc(50% - 14px);
+      z-index: 2;
 
       background:
         repeating-linear-gradient(
@@ -618,24 +565,43 @@
 
       border-radius: 2px;
 
-      z-index: 2;
-
       transition:
-        transform 0.4s ease-in-out,
-        opacity 0.4s ease-in-out;
+        transform .45s ease-in-out,
+        opacity .45s ease-in-out;
     }
 
     .barrier-arm.arm-left {
       left: 14px;
-
       transform-origin: left center;
     }
 
     .barrier-arm.arm-right {
       right: 14px;
-
       transform-origin: right center;
     }
+
+    .barrier-arm.arm-left.open {
+      transform: rotate(-55deg);
+      opacity: .35;
+    }
+
+    .barrier-arm.arm-right.open {
+      transform: rotate(55deg);
+      opacity: .35;
+    }
+
+    .barrier-arm.arm-left.closed,
+    .barrier-arm.arm-right.closed {
+      transform: rotate(0deg);
+      opacity: 1;
+
+      box-shadow:
+        0 0 10px rgba(255,42,85,.6);
+    }
+
+    /* =========================================================
+       STOP SYMBOL
+       ========================================================= */
 
     .gate-stop-symbol {
       position: absolute;
@@ -644,22 +610,19 @@
       top: 50%;
 
       transform:
-        translate(-50%, -50%)
-        scale(0.5);
+        translate(-50%,-50%)
+        scale(.5);
 
       font-size: 28px;
-      line-height: 1;
 
       opacity: 0;
       visibility: hidden;
 
       z-index: 10;
 
-      pointer-events: none;
-
       transition:
-        opacity 0.25s ease,
-        transform 0.25s ease;
+        opacity .25s ease,
+        transform .25s ease;
     }
 
     .gate-stop-symbol.active {
@@ -667,47 +630,30 @@
       visibility: visible;
 
       transform:
-        translate(-50%, -50%)
+        translate(-50%,-50%)
         scale(1);
 
       animation:
-        centerStopPulse 1.2s ease-in-out infinite;
+        centerStopPulse 1s ease-in-out infinite;
     }
 
     @keyframes centerStopPulse {
-      0%,
-      100% {
+      0%,100% {
         transform:
-          translate(-50%, -50%)
+          translate(-50%,-50%)
           scale(1);
       }
 
       50% {
         transform:
-          translate(-50%, -50%)
+          translate(-50%,-50%)
           scale(1.12);
       }
     }
 
-    .barrier-arm.arm-left.open {
-      transform: rotate(-55deg);
-      opacity: 0.35;
-    }
-
-    .barrier-arm.arm-right.open {
-      transform: rotate(55deg);
-      opacity: 0.35;
-    }
-
-    .barrier-arm.arm-left.closed,
-    .barrier-arm.arm-right.closed {
-      transform: rotate(0deg);
-
-      opacity: 1;
-
-      box-shadow:
-        0 0 10px rgba(255, 42, 85, 0.6);
-    }
+    /* =========================================================
+       READOUTS
+       ========================================================= */
 
     .gate-readouts {
       display: grid;
@@ -724,101 +670,105 @@
     }
 
     .train-info-label {
-      font-size: 0.68rem;
-
-      text-transform: uppercase;
+      margin-bottom: 2px;
 
       color: var(--dim);
 
-      margin-bottom: 2px;
+      font-size: .68rem;
+
+      text-transform: uppercase;
     }
 
     .train-info-val {
-      font-size: 0.85rem;
-
-      font-weight: 700;
-
-      color: #e2e8f0;
-
-      white-space: nowrap;
+      max-width: 300px;
 
       overflow: hidden;
 
+      white-space: nowrap;
       text-overflow: ellipsis;
 
-      max-width: 280px;
+      font-size: .85rem;
+      font-weight: 700;
     }
 
     .wait-digits {
-      font-family: 'JetBrains Mono', monospace;
-
-      font-size: 1.25rem;
-
-      font-weight: 800;
-
-      color: var(--text);
-
       text-align: right;
+
+      font-family:
+        "JetBrains Mono",
+        monospace;
+
+      font-size: 1.2rem;
+      font-weight: 800;
     }
 
     .wait-label {
-      font-size: 0.65rem;
+      text-align: right;
 
       color: var(--dim);
 
-      text-transform: uppercase;
+      font-size: .65rem;
 
-      text-align: right;
+      text-transform: uppercase;
     }
 
-    details.upcoming-wrapper {
+    /* =========================================================
+       DISTANCE BADGE
+       ========================================================= */
+
+    .distance-line {
+      margin-top: 4px;
+
+      color: var(--dim);
+
+      font-family:
+        "JetBrains Mono",
+        monospace;
+
+      font-size: .68rem;
+    }
+
+    .distance-warning {
+      color: var(--amber);
+      font-weight: 800;
+    }
+
+    .distance-danger {
+      color: var(--red);
+      font-weight: 800;
+    }
+
+    /* =========================================================
+       UPCOMING
+       ========================================================= */
+
+    .upcoming-wrapper {
+      overflow: hidden;
+
       background: var(--surface);
 
       border: 1px solid var(--border);
-
       border-radius: 12px;
-
-      overflow: hidden;
     }
 
-    summary.upcoming-summary {
+    .upcoming-summary {
       padding: 14px 16px;
-
-      font-size: 0.88rem;
-
-      font-weight: 700;
-
-      color: #38bdf8;
-
-      cursor: pointer;
-
-      list-style: none;
 
       display: flex;
       justify-content: space-between;
       align-items: center;
 
-      user-select: none;
+      cursor: pointer;
 
-      background: var(--surface);
+      color: var(--blue);
 
-      transition:
-        background 0.15s ease;
-    }
-
-    summary.upcoming-summary::-webkit-details-marker {
-      display: none;
-    }
-
-    summary.upcoming-summary:hover {
-      background: var(--surface-elevated);
+      font-size: .88rem;
+      font-weight: 700;
     }
 
     .summary-arrow {
-      font-size: 0.75rem;
-
       transition:
-        transform 0.2s ease;
+        transform .2s ease;
     }
 
     details[open] .summary-arrow {
@@ -828,113 +778,104 @@
     .upcoming-body {
       padding: 12px 14px 14px;
 
-      border-top: 1px solid #1c2738;
-
       display: flex;
       flex-direction: column;
 
       gap: 8px;
+
+      border-top: 1px solid var(--border);
     }
 
     .upcoming-item {
       display: flex;
-
       justify-content: space-between;
       align-items: center;
 
-      background: rgba(0, 0, 0, 0.25);
-
-      border: 1px solid rgba(255, 255, 255, 0.04);
-
       padding: 10px 12px;
 
+      background:
+        rgba(0,0,0,.25);
+
+      border: 1px solid rgba(255,255,255,.04);
       border-radius: 8px;
 
       min-width: 0;
     }
 
-    .train-col {
-      display: flex;
+    body.light-mode .upcoming-item {
+      background:
+        rgba(15,23,42,.035);
 
+      border-color:
+        rgba(15,23,42,.08);
+    }
+
+    .train-col {
+      max-width: 72%;
+      min-width: 0;
+
+      display: flex;
       flex-direction: column;
 
-      gap: 2px;
-
-      max-width: 70%;
-
-      min-width: 0;
+      gap: 3px;
     }
 
     .train-head {
-      font-size: 0.84rem;
-
-      font-weight: 700;
-
-      color: #f1f5f9;
-
-      white-space: nowrap;
-
       overflow: hidden;
 
+      white-space: nowrap;
       text-overflow: ellipsis;
+
+      font-size: .84rem;
+      font-weight: 700;
     }
 
     .train-sub {
       display: flex;
 
-      align-items: center;
+      flex-wrap: wrap;
 
       gap: 6px;
 
-      font-size: 0.72rem;
-
       color: var(--dim);
 
-      flex-wrap: wrap;
+      font-size: .68rem;
     }
 
     .corridor-pill {
-      font-size: 0.65rem;
-
-      font-weight: 800;
-
       padding: 1px 5px;
 
       border-radius: 4px;
+
+      font-size: .63rem;
+      font-weight: 800;
     }
 
     .corridor-mas {
-      background: rgba(99, 102, 241, 0.2);
-
+      background: rgba(99,102,241,.2);
       color: #818cf8;
     }
 
     .corridor-tpty {
-      background: rgba(245, 158, 11, 0.2);
-
+      background: rgba(245,158,11,.2);
       color: #fbbf24;
     }
 
-    .corridor-other {
-      background: rgba(148, 163, 184, 0.18);
-
-      color: #94a3b8;
-    }
-
     .eta-col {
-      text-align: right;
-
       flex-shrink: 0;
+
+      text-align: right;
     }
 
     .eta-min {
-      font-family: 'JetBrains Mono', monospace;
+      color: var(--blue);
+
+      font-family:
+        "JetBrains Mono",
+        monospace;
 
       font-size: 1rem;
-
       font-weight: 800;
-
-      color: #38bdf8;
     }
 
     .eta-min.urgent {
@@ -948,43 +889,43 @@
         etaPulse 1s ease-in-out infinite;
     }
 
+    .eta-sub {
+      color: var(--dim);
+
+      font-size: .65rem;
+    }
+
     @keyframes etaPulse {
-      0%,
-      100% {
+      0%,100% {
         opacity: 1;
       }
 
       50% {
-        opacity: 0.45;
+        opacity: .45;
       }
     }
 
-    .eta-sub {
-      font-size: 0.65rem;
-
-      color: var(--dim);
-    }
-
     .upcoming-empty {
-      text-align: center;
-
       padding: 16px 10px;
 
+      text-align: center;
+
       color: var(--dim);
 
-      font-size: 0.78rem;
-
-      line-height: 1.4;
+      font-size: .78rem;
     }
 
+    /* =========================================================
+       SAFETY
+       ========================================================= */
+
     .safety-panel {
+      padding: 14px;
+
       background: var(--surface);
 
       border: 1px solid var(--border);
-
       border-radius: 12px;
-
-      padding: 14px;
 
       display: flex;
       flex-direction: column;
@@ -994,22 +935,19 @@
 
     .safety-header {
       display: flex;
-
       align-items: center;
 
       gap: 8px;
 
-      border-bottom: 1px solid #1c2738;
-
       padding-bottom: 8px;
+
+      border-bottom: 1px solid var(--border);
     }
 
     .safety-header h3 {
-      font-size: 0.92rem;
-
-      font-weight: 700;
-
       color: var(--amber);
+
+      font-size: .92rem;
     }
 
     .safety-list {
@@ -1023,76 +961,66 @@
 
     .safety-item {
       display: flex;
-
       align-items: flex-start;
 
       gap: 8px;
 
-      font-size: 0.8rem;
-
-      line-height: 1.35;
-
       color: #cbd5e1;
+
+      font-size: .8rem;
+      line-height: 1.35;
+    }
+
+    body.light-mode .safety-item {
+      color: #334155;
     }
 
     .safety-badge {
-      font-size: 0.65rem;
-
-      font-weight: 800;
+      flex-shrink: 0;
 
       padding: 2px 6px;
 
-      border-radius: 4px;
-
-      background: rgba(255, 42, 85, 0.15);
-
-      border: 1px solid rgba(255, 42, 85, 0.4);
-
       color: var(--red);
 
-      flex-shrink: 0;
+      background: rgba(255,42,85,.15);
 
-      margin-top: 1px;
+      border: 1px solid rgba(255,42,85,.4);
+      border-radius: 4px;
+
+      font-size: .62rem;
+      font-weight: 800;
     }
 
     .safety-badge.warn {
-      background: rgba(245, 158, 11, 0.15);
-
-      border-color: rgba(245, 158, 11, 0.4);
-
       color: var(--amber);
+
+      background:
+        rgba(245,158,11,.15);
+
+      border-color:
+        rgba(245,158,11,.4);
     }
 
-    body.lang-en .lang-te-only,
-    body.lang-en .lang-hi-only {
-      display: none !important;
-    }
-
-    body.lang-te .lang-en-only,
-    body.lang-te .lang-hi-only {
-      display: none !important;
-    }
-
-    body.lang-hi .lang-en-only,
-    body.lang-hi .lang-te-only {
-      display: none !important;
-    }
+    /* =========================================================
+       FOOTER
+       ========================================================= */
 
     footer {
       display: flex;
-
       justify-content: space-between;
-
-      font-size: 0.68rem;
-
-      color: var(--dim);
 
       padding: 2px 4px 0;
 
-      font-family: 'JetBrains Mono', monospace;
+      color: var(--dim);
+
+      font-family:
+        "JetBrains Mono",
+        monospace;
+
+      font-size: .68rem;
     }
 
-    @media (max-width: 520px) {
+    @media(max-width:520px) {
 
       .hud-header {
         align-items: flex-start;
@@ -1100,60 +1028,17 @@
 
       .header-controls {
         width: 100%;
-
         justify-content: space-between;
       }
 
-      .title-block h1 {
-        font-size: 0.98rem;
-      }
-
-      .gate-controls {
-        gap: 5px;
-      }
-
-      .gate-status {
-        min-width: 52px;
-
-        padding-left: 6px;
-        padding-right: 6px;
-      }
-
-      .signal-box {
-        padding-left: 5px;
-        padding-right: 5px;
-      }
-
-      .lang-btn {
-        padding-left: 9px;
-        padding-right: 9px;
-      }
-    }
-
-    @media (max-width: 390px) {
-
       .gate-meta h2 {
-        font-size: 0.98rem;
-      }
-
-      .gate-sub {
-        font-size: 0.67rem;
+        font-size: 1rem;
       }
 
       .gate-status {
-        min-width: 48px;
-
-        font-size: 0.66rem;
+        min-width: 56px;
       }
 
-      .lamp {
-        width: 14px;
-        height: 14px;
-      }
-
-      .theme-btn {
-        padding: 6px 8px;
-      }
     }
 
   </style>
@@ -1163,6 +1048,10 @@
 <body class="lang-en">
 
   <div class="app">
+
+    <!-- =======================================================
+         HEADER
+         ======================================================== -->
 
     <header class="hud-header">
 
@@ -1186,27 +1075,24 @@
 
       </div>
 
+
       <div class="header-controls">
 
-        <div class="theme-switcher">
+        <button
+          id="theme-toggle"
+          class="theme-btn"
+          type="button"
+          onclick="toggleTheme()"
+        >
+          🌙 Dark
+        </button>
 
-          <button
-            id="theme-toggle"
-            class="theme-btn"
-            type="button"
-            onclick="toggleTheme()"
-            aria-label="Toggle light and dark mode"
-          >
-            🌙 Dark
-          </button>
-
-        </div>
 
         <div class="lang-switcher">
 
           <button
-            class="lang-btn"
             id="btn-te"
+            class="lang-btn"
             type="button"
             onclick="setAppLanguage('te')"
           >
@@ -1214,8 +1100,8 @@
           </button>
 
           <button
-            class="lang-btn active"
             id="btn-en"
+            class="lang-btn active"
             type="button"
             onclick="setAppLanguage('en')"
           >
@@ -1223,8 +1109,8 @@
           </button>
 
           <button
-            class="lang-btn"
             id="btn-hi"
+            class="lang-btn"
             type="button"
             onclick="setAppLanguage('hi')"
           >
@@ -1238,6 +1124,10 @@
     </header>
 
 
+    <!-- =======================================================
+         ADVISORY
+         ======================================================== -->
+
     <div
       class="decision-hub"
       id="decision-card"
@@ -1245,51 +1135,54 @@
 
       <div class="decision-top">
 
-        <span class="decision-label lang-en-only">
-          TRAFFIC ADVISORY
+        <span class="decision-label">
+          <span class="lang-en-only">
+            TRAFFIC ADVISORY
+          </span>
+
+          <span class="lang-te-only">
+            ట్రాఫిక్ సమాచారం
+          </span>
+
+          <span class="lang-hi-only">
+            यातायात सलाह
+          </span>
         </span>
 
-        <span class="decision-label lang-te-only">
-          ట్రాఫిక్ సమాచారం
-        </span>
-
-        <span class="decision-label lang-hi-only">
-          यातायात सलाह
-        </span>
 
         <span
           id="decision-status"
           class="decision-label"
-          style="color: var(--green);"
+          style="color:var(--green)"
         >
           CLEAR
         </span>
 
       </div>
 
+
       <div
-        class="route-action"
         id="decision-title"
+        class="route-action"
       >
         Both Crossings Are Open
       </div>
 
+
       <div
-        class="route-desc"
         id="decision-text"
+        class="route-desc"
       >
-        No trains approaching Gudur Junction.
-        Corridors are clear for transit.
+        No verified trains are currently approaching Gudur Junction.
       </div>
+
 
       <a
         href="https://www.google.com/maps/dir/?api=1&destination=Gudur+Junction+Railway+Station"
         target="_blank"
         rel="noopener noreferrer"
         class="maps-btn"
-        id="maps-action"
       >
-
         <span class="lang-en-only">
           Open Gudur Route Map →
         </span>
@@ -1301,11 +1194,14 @@
         <span class="lang-hi-only">
           मार्ग का नक्शा देखें →
         </span>
-
       </a>
 
     </div>
 
+
+    <!-- =======================================================
+         CHENNAI GATE
+         ======================================================== -->
 
     <div class="gate-card">
 
@@ -1331,6 +1227,7 @@
 
         </div>
 
+
         <div class="gate-controls">
 
           <div
@@ -1340,16 +1237,22 @@
             GO
           </div>
 
+
           <div class="signal-box">
 
             <div
-              class="lamp"
               id="mas-lamp-red"
+              class="lamp"
             ></div>
 
             <div
-              class="lamp green-on"
+              id="mas-lamp-amber"
+              class="lamp"
+            ></div>
+
+            <div
               id="mas-lamp-green"
+              class="lamp green-on"
             ></div>
 
           </div>
@@ -1358,6 +1261,7 @@
 
       </div>
 
+
       <div class="crossing-graphic">
 
         <div class="rail-track"></div>
@@ -1365,18 +1269,18 @@
         <div class="gate-post left"></div>
 
         <div
-          class="barrier-arm arm-left open"
           id="mas-arm-left"
+          class="barrier-arm arm-left open"
         ></div>
 
         <div
-          class="barrier-arm arm-right open"
           id="mas-arm-right"
+          class="barrier-arm arm-right open"
         ></div>
 
         <div
-          class="gate-stop-symbol"
           id="mas-gate-stop-symbol"
+          class="gate-stop-symbol"
           aria-hidden="true"
         >
           🛑
@@ -1386,50 +1290,69 @@
 
       </div>
 
+
       <div class="gate-readouts">
 
         <div>
 
-          <div class="train-info-label lang-en-only">
-            Active Rail Vehicle
+          <div class="train-info-label">
+
+            <span class="lang-en-only">
+              Active Rail Vehicle
+            </span>
+
+            <span class="lang-te-only">
+              వస్తున్న రైలు
+            </span>
+
+            <span class="lang-hi-only">
+              आ रही ट्रेन
+            </span>
+
           </div>
 
-          <div class="train-info-label lang-te-only">
-            వస్తున్న రైలు
-          </div>
-
-          <div class="train-info-label lang-hi-only">
-            आ रही ट्रेन
-          </div>
 
           <div
-            class="train-info-val"
             id="mas-train"
+            class="train-info-val"
           >
             Tracks Clear
           </div>
 
+
+          <div
+            id="mas-distance"
+            class="distance-line"
+          >
+            Distance: —
+          </div>
+
         </div>
+
 
         <div>
 
           <div
-            class="wait-digits"
             id="mas-wait"
+            class="wait-digits"
           >
             0m
           </div>
 
-          <div class="wait-label lang-en-only">
-            Est. Wait
-          </div>
+          <div class="wait-label">
 
-          <div class="wait-label lang-te-only">
-            వేచి ఉండే సమయం
-          </div>
+            <span class="lang-en-only">
+              Est. Wait
+            </span>
 
-          <div class="wait-label lang-hi-only">
-            अनुमानित प्रतीक्षा
+            <span class="lang-te-only">
+              వేచి ఉండే సమయం
+            </span>
+
+            <span class="lang-hi-only">
+              अनुमानित प्रतीक्षा
+            </span>
+
           </div>
 
         </div>
@@ -1438,6 +1361,10 @@
 
     </div>
 
+
+    <!-- =======================================================
+         TIRUPATI GATE
+         ======================================================== -->
 
     <div class="gate-card">
 
@@ -1463,6 +1390,7 @@
 
         </div>
 
+
         <div class="gate-controls">
 
           <div
@@ -1472,16 +1400,22 @@
             GO
           </div>
 
+
           <div class="signal-box">
 
             <div
-              class="lamp"
               id="tpty-lamp-red"
+              class="lamp"
             ></div>
 
             <div
-              class="lamp green-on"
+              id="tpty-lamp-amber"
+              class="lamp"
+            ></div>
+
+            <div
               id="tpty-lamp-green"
+              class="lamp green-on"
             ></div>
 
           </div>
@@ -1490,6 +1424,7 @@
 
       </div>
 
+
       <div class="crossing-graphic">
 
         <div class="rail-track"></div>
@@ -1497,18 +1432,18 @@
         <div class="gate-post left"></div>
 
         <div
-          class="barrier-arm arm-left open"
           id="tpty-arm-left"
+          class="barrier-arm arm-left open"
         ></div>
 
         <div
-          class="barrier-arm arm-right open"
           id="tpty-arm-right"
+          class="barrier-arm arm-right open"
         ></div>
 
         <div
-          class="gate-stop-symbol"
           id="tpty-gate-stop-symbol"
+          class="gate-stop-symbol"
           aria-hidden="true"
         >
           🛑
@@ -1518,50 +1453,69 @@
 
       </div>
 
+
       <div class="gate-readouts">
 
         <div>
 
-          <div class="train-info-label lang-en-only">
-            Active Rail Vehicle
+          <div class="train-info-label">
+
+            <span class="lang-en-only">
+              Active Rail Vehicle
+            </span>
+
+            <span class="lang-te-only">
+              వస్తున్న రైలు
+            </span>
+
+            <span class="lang-hi-only">
+              आ रही ट्रेन
+            </span>
+
           </div>
 
-          <div class="train-info-label lang-te-only">
-            వస్తున్న రైలు
-          </div>
-
-          <div class="train-info-label lang-hi-only">
-            आ रही ट्रेन
-          </div>
 
           <div
-            class="train-info-val"
             id="tpty-train"
+            class="train-info-val"
           >
             Tracks Clear
           </div>
 
+
+          <div
+            id="tpty-distance"
+            class="distance-line"
+          >
+            Distance: —
+          </div>
+
         </div>
+
 
         <div>
 
           <div
-            class="wait-digits"
             id="tpty-wait"
+            class="wait-digits"
           >
             0m
           </div>
 
-          <div class="wait-label lang-en-only">
-            Est. Wait
-          </div>
+          <div class="wait-label">
 
-          <div class="wait-label lang-te-only">
-            వేచి ఉండే సమయం
-          </div>
+            <span class="lang-en-only">
+              Est. Wait
+            </span>
 
-          <div class="wait-label lang-hi-only">
-            अनुमानित प्रतीक्षा
+            <span class="lang-te-only">
+              వేచి ఉండే సమయం
+            </span>
+
+            <span class="lang-hi-only">
+              अनुमानित प्रतीक्षा
+            </span>
+
           </div>
 
         </div>
@@ -1571,9 +1525,13 @@
     </div>
 
 
+    <!-- =======================================================
+         UPCOMING TRAINS
+         ======================================================== -->
+
     <details
-      class="upcoming-wrapper"
       id="upcoming-accordion"
+      class="upcoming-wrapper"
     >
 
       <summary class="upcoming-summary">
@@ -1585,11 +1543,11 @@
           </span>
 
           <span class="lang-te-only">
-            🔍 త్వరలో వచ్చే రైళ్ల వివరాలు (చూడండి/దాచండి)
+            🔍 త్వరలో వచ్చే రైళ్ల వివరాలు
           </span>
 
           <span class="lang-hi-only">
-            🔍 आने वाली ट्रेनें (देखें / छुपाएं)
+            🔍 आने वाली ट्रेनें
           </span>
 
         </span>
@@ -1600,37 +1558,14 @@
 
       </summary>
 
+
       <div
-        class="upcoming-body"
         id="upcoming-container"
+        class="upcoming-body"
       >
 
-        <div class="upcoming-item">
-
-          <div class="train-col">
-
-            <div class="train-head">
-              Loading live trains...
-            </div>
-
-            <div class="train-sub">
-              Waiting for verified live data
-            </div>
-
-          </div>
-
-          <div class="eta-col">
-
-            <div class="eta-min">
-              —
-            </div>
-
-            <div class="eta-sub">
-              live
-            </div>
-
-          </div>
-
+        <div class="upcoming-empty">
+          Loading live trains...
         </div>
 
       </div>
@@ -1638,13 +1573,15 @@
     </details>
 
 
+    <!-- =======================================================
+         SAFETY
+         ======================================================== -->
+
     <div class="safety-panel">
 
       <div class="safety-header">
 
-        <span>
-          ⚠️
-        </span>
+        <span>⚠️</span>
 
         <h3 class="lang-en-only">
           Level Crossing Safety Rules
@@ -1660,55 +1597,47 @@
 
       </div>
 
+
       <ul class="safety-list lang-en-only">
 
         <li class="safety-item">
 
-          <span class="safety-badge">
+          <span class="safety-badge warn">
             WARNING
           </span>
 
           <span>
-            <strong>
-              Never cross when gates close:
-            </strong>
-            Crawling under barriers is a severe
-            punishable railway offense.
+            When a train is within 1 km, slow down and prepare to stop.
           </span>
 
         </li>
 
-        <li class="safety-item">
-
-          <span class="safety-badge warn">
-            RULE
-          </span>
-
-          <span>
-            <strong>
-              Stop, Look, Listen:
-            </strong>
-            Always halt behind the white stop line
-            whenever the red signal lamp is illuminated.
-          </span>
-
-        </li>
 
         <li class="safety-item">
 
           <span class="safety-badge">
-            DANGER
+            STOP
           </span>
 
           <span>
-            <strong>
-              No Earphones:
-            </strong>
-            Never use mobile phones or wear headphones
-            near active tracks.
+            Never cross when the red signal or STOP indication is active.
           </span>
 
         </li>
+
+
+        <li class="safety-item">
+
+          <span class="safety-badge">
+            RULE
+          </span>
+
+          <span>
+            Stop behind the crossing stop line and wait for full clearance.
+          </span>
+
+        </li>
+
 
         <li class="safety-item">
 
@@ -1717,147 +1646,119 @@
           </span>
 
           <span>
-            <strong>
-              Wait for Full Clearance:
-            </strong>
-            Wait until both barrier booms lift completely
-            and the green light turns on.
+            Wait until the barriers are fully raised and the green signal returns.
           </span>
 
         </li>
 
       </ul>
+
 
       <ul class="safety-list lang-te-only">
 
         <li class="safety-item">
 
-          <span class="safety-badge">
+          <span class="safety-badge warn">
             హెచ్చరిక
           </span>
 
           <span>
-            <strong>
-              గేట్ మూసివేసేటప్పుడు దాటరాదు:
-            </strong>
-            బూమ్ బారియర్ కింద నుంచి లేదా సందుల నుండి
-            వెళ్లడం చట్టరీత్యా నేరం.
+            రైలు 1 కి.మీ లోపల ఉన్నప్పుడు వేగాన్ని తగ్గించి ఆగడానికి సిద్ధంగా ఉండండి.
           </span>
 
         </li>
 
-        <li class="safety-item">
-
-          <span class="safety-badge warn">
-            నియమం
-          </span>
-
-          <span>
-            <strong>
-              ఆగండి, చూడండి, వినండి:
-            </strong>
-            ఎరుపు లైట్ వెలుగుతున్నప్పుడు వాహనాన్ని
-            స్టాప్ లైన్ వెనుకే నిలపండి.
-          </span>
-
-        </li>
 
         <li class="safety-item">
 
           <span class="safety-badge">
-            ప్రమాదం
+            ఆగండి
           </span>
 
           <span>
-            <strong>
-              హెడ్‌ఫోన్లు వాడకండి:
-            </strong>
-            ట్రాక్ సమీపంలో నడుస్తున్నప్పుడు లేదా వాహనం
-            నడుపుతున్నప్పుడు ఫోన్లు వాడవద్దు.
+            ఎరుపు లైట్ లేదా STOP సూచన ఉన్నప్పుడు గేట్ దాటవద్దు.
           </span>
 
         </li>
 
+
         <li class="safety-item">
 
-          <span class="safety-badge warn">
-            సహాయం
+          <span class="safety-badge">
+            నియమం
           </span>
 
           <span>
-            <strong>
-              గేట్ పూర్తిగా తెరిచేవరకు ఆగండి:
-            </strong>
-            ఆకుపచ్చ లైట్ వెలిగి గేట్ పూర్తిగా పైకి
-            లేచిన తర్వాతే వెళ్లండి.
+            స్టాప్ లైన్ వెనుక ఆగి రైలు పూర్తిగా దాటే వరకు వేచి ఉండండి.
+          </span>
+
+        </li>
+
+
+        <li class="safety-item">
+
+          <span class="safety-badge warn">
+            గమనిక
+          </span>
+
+          <span>
+            గేట్లు పూర్తిగా తెరుచుకుని ఆకుపచ్చ లైట్ వచ్చే వరకు వేచి ఉండండి.
           </span>
 
         </li>
 
       </ul>
 
+
       <ul class="safety-list lang-hi-only">
 
         <li class="safety-item">
 
-          <span class="safety-badge">
+          <span class="safety-badge warn">
             चेतावनी
           </span>
 
           <span>
-            <strong>
-              फाटक बंद होते समय पार न करें:
-            </strong>
-            बूम बैरियर के नीचे से निकलना रेलवे कानून
-            के तहत अपराध है।
+            जब ट्रेन 1 किमी के अंदर हो तो गति कम करें और रुकने के लिए तैयार रहें।
           </span>
 
         </li>
 
-        <li class="safety-item">
-
-          <span class="safety-badge warn">
-            नियम
-          </span>
-
-          <span>
-            <strong>
-              रुकें, देखें और सुनें:
-            </strong>
-            लाल बत्ती जलने पर अपने वाहन को स्टॉप लाइन
-            के पीछे ही रोकें।
-          </span>
-
-        </li>
 
         <li class="safety-item">
 
           <span class="safety-badge">
-            खतरा
+            रुकें
           </span>
 
           <span>
-            <strong>
-              ईयरफोन का प्रयोग न करें:
-            </strong>
-            ट्रैक के पास फोन या हेडफ़ोन का प्रयोग
-            बिल्कुल न करें।
+            लाल बत्ती या STOP संकेत होने पर फाटक पार न करें।
           </span>
 
         </li>
 
+
         <li class="safety-item">
 
-          <span class="safety-badge warn">
-            सावधानी
+          <span class="safety-badge">
+            नियम
           </span>
 
           <span>
-            <strong>
-              फाटक पूरी तरह खुलने दें:
-            </strong>
-            दोनों बूम पूरी तरह ऊपर उठने और हरी बत्ती
-            जलने के बाद ही आगे बढ़ें।
+            स्टॉप लाइन के पीछे रुकें और ट्रेन के पूरी तरह गुजरने तक प्रतीक्षा करें।
+          </span>
+
+        </li>
+
+
+        <li class="safety-item">
+
+          <span class="safety-badge warn">
+            सूचना
+          </span>
+
+          <span>
+            फाटक पूरी तरह खुलने और हरी बत्ती आने के बाद ही आगे बढ़ें।
           </span>
 
         </li>
@@ -1867,6 +1768,10 @@
     </div>
 
 
+    <!-- =======================================================
+         FOOTER
+         ======================================================== -->
+
     <footer>
 
       <span>
@@ -1875,14 +1780,9 @@
 
       <span>
         SYNC:
-
-        <span
-          id="sync-stamp"
-          style="color: #cbd5e1;"
-        >
+        <span id="sync-stamp">
           Waiting...
         </span>
-
       </span>
 
     </footer>
@@ -1890,7 +1790,60 @@
   </div>
 
 
+  <!-- =========================================================
+       FIREBASE
+       ========================================================== -->
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+
   <script>
+
+    /* =========================================================
+       GLOBAL STATE
+       ========================================================= */
+
+    window.__lastData = null;
+
+    window.__etaReferenceTime = null;
+
+    window.__displayQueue = [];
+
+
+    /* =========================================================
+       TEXT HELPERS
+       ========================================================= */
+
+    function safeText(value) {
+
+      if (
+        value === null ||
+        value === undefined
+      ) {
+        return "";
+      }
+
+      return String(value);
+    }
+
+
+    function escapeHtml(value) {
+
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+    }
+
+
+    /* =========================================================
+       THEME
+       ========================================================= */
 
     function applyTheme(theme) {
 
@@ -1899,230 +1852,165 @@
 
       const button =
         document.getElementById(
-          'theme-toggle'
+          "theme-toggle"
         );
 
-      if (theme === 'light') {
+      if (
+        theme === "light"
+      ) {
 
         body.classList.add(
-          'light-mode'
+          "light-mode"
         );
 
         if (button) {
 
           button.innerHTML =
-            '☀️ Light';
+            "☀️ Light";
 
           button.setAttribute(
-            'aria-label',
-            'Switch to dark mode'
+            "aria-label",
+            "Switch to dark mode"
           );
+
         }
 
       } else {
 
         body.classList.remove(
-          'light-mode'
+          "light-mode"
         );
 
         if (button) {
 
           button.innerHTML =
-            '🌙 Dark';
+            "🌙 Dark";
 
           button.setAttribute(
-            'aria-label',
-            'Switch to light mode'
+            "aria-label",
+            "Switch to light mode"
           );
+
         }
+
       }
 
       localStorage.setItem(
-        'gdr-theme',
+        "gdr-theme",
         theme
       );
+
     }
 
 
     function toggleTheme() {
 
-      const isLight =
+      const light =
         document.body.classList.contains(
-          'light-mode'
+          "light-mode"
         );
 
       applyTheme(
-        isLight
-          ? 'dark'
-          : 'light'
+        light
+          ? "dark"
+          : "light"
       );
+
     }
 
 
-    (function loadSavedTheme() {
-
-      const savedTheme =
-        localStorage.getItem(
-          'gdr-theme'
-        );
-
-      if (savedTheme === 'light') {
-
-        document.body.classList.add(
-          'light-mode'
-        );
-
-      }
-
-    })();
-
-
-    document.addEventListener(
-      'DOMContentLoaded',
-      function () {
-
-        const savedTheme =
-          localStorage.getItem(
-            'gdr-theme'
-          ) || 'dark';
-
-        applyTheme(
-          savedTheme
-        );
-
-      }
-    );
-
-  </script>
-
-
-  <script>
+    /* =========================================================
+       LANGUAGE
+       ========================================================= */
 
     function setAppLanguage(lang) {
 
       if (
-        !['en', 'te', 'hi'].includes(lang)
+        !["en", "te", "hi"].includes(lang)
       ) {
-        lang = 'en';
+        lang = "en";
       }
 
       document.body.classList.remove(
-        'lang-en',
-        'lang-te',
-        'lang-hi'
+        "lang-en",
+        "lang-te",
+        "lang-hi"
       );
 
       document.body.classList.add(
-        'lang-' + lang
+        "lang-" + lang
       );
 
+
       const btnEn =
-        document.getElementById(
-          'btn-en'
-        );
+        document.getElementById("btn-en");
 
       const btnTe =
-        document.getElementById(
-          'btn-te'
-        );
+        document.getElementById("btn-te");
 
       const btnHi =
-        document.getElementById(
-          'btn-hi'
-        );
+        document.getElementById("btn-hi");
+
 
       if (btnEn) {
 
         btnEn.className =
-          'lang-btn' +
+          "lang-btn" +
           (
-            lang === 'en'
-              ? ' active'
-              : ''
+            lang === "en"
+              ? " active"
+              : ""
           );
+
       }
+
 
       if (btnTe) {
 
         btnTe.className =
-          'lang-btn' +
+          "lang-btn" +
           (
-            lang === 'te'
-              ? ' active'
-              : ''
+            lang === "te"
+              ? " active"
+              : ""
           );
+
       }
+
 
       if (btnHi) {
 
         btnHi.className =
-          'lang-btn' +
+          "lang-btn" +
           (
-            lang === 'hi'
-              ? ' active'
-              : ''
+            lang === "hi"
+              ? " active"
+              : ""
           );
+
       }
 
+
       localStorage.setItem(
-        'gdr-language',
+        "gdr-language",
         lang
       );
+
 
       if (window.__lastData) {
 
         renderLiveUI(
           window.__lastData
         );
+
       }
+
     }
 
 
-    function safeText(value) {
-
-      if (
-        value === null ||
-        value === undefined
-      ) {
-        return '';
-      }
-
-      return String(value);
-    }
-
-
-    /*
-     * ========================================================
-     * CONTINUOUS ETA COUNTDOWN
-     * ========================================================
-     *
-     * Firebase gives the authoritative ETA.
-     *
-     * The phone calculates the elapsed time locally.
-     *
-     * Therefore:
-     *
-     * GitHub update: 10m
-     *
-     * Phone:
-     *
-     * 10m
-     * 9m
-     * 8m
-     * 7m
-     * ...
-     *
-     * without waiting for GitHub.
-     *
-     * This DOES NOT make the backend update faster.
-     *
-     * It only keeps the display moving continuously.
-     *
-     * ========================================================
-     */
-
-    window.__etaReferenceTime = null;
-
+    /* =========================================================
+       FIREBASE SYNC TIME
+       ========================================================= */
 
     function getFirebaseSyncTime(data) {
 
@@ -2131,71 +2019,28 @@
         data.lastUpdatedAt
       ) {
 
-        const timestamp =
+        const time =
           Date.parse(
             data.lastUpdatedAt
           );
 
         if (
-          Number.isFinite(timestamp)
+          Number.isFinite(time)
         ) {
-
-          return timestamp;
+          return time;
         }
-      }
 
-
-      if (
-        data &&
-        data.lastUpdatedLocal
-      ) {
-
-        const timestamp =
-          Date.parse(
-            data.lastUpdatedLocal
-          );
-
-        if (
-          Number.isFinite(timestamp)
-        ) {
-
-          return timestamp;
-        }
-      }
-
-
-      if (
-        data &&
-        data.lastUpdated
-      ) {
-
-        const text =
-          String(
-            data.lastUpdated
-          ).trim();
-
-        const now =
-          new Date();
-
-        const parsed =
-          new Date(
-            `${now.toDateString()} ${text}`
-          );
-
-        if (
-          !isNaN(
-            parsed.getTime()
-          )
-        ) {
-
-          return parsed.getTime();
-        }
       }
 
 
       return Date.now();
+
     }
 
+
+    /* =========================================================
+       ETA COUNTDOWN
+       ========================================================= */
 
     function calculateLiveEtaMinutes(
       originalEta,
@@ -2203,14 +2048,11 @@
     ) {
 
       const eta =
-        Number(
-          originalEta
-        );
+        Number(originalEta);
 
       if (
         !Number.isFinite(eta)
       ) {
-
         return null;
       }
 
@@ -2225,48 +2067,27 @@
           0,
           Math.ceil(eta)
         );
+
       }
 
 
-      const elapsedMs =
-        Date.now() -
-        referenceTime;
+      const elapsed =
+        (
+          Date.now() -
+          referenceTime
+        ) / 60000;
 
-
-      const elapsedMinutes =
-        elapsedMs / 60000;
-
-
-      const liveEta =
-        eta -
-        elapsedMinutes;
-
-
-      /*
-       * CEIL is used so:
-       *
-       * 4.99 = 5m
-       * 4.01 = 5m
-       * 4.00 = 4m
-       *
-       * This prevents the countdown from dropping
-       * one minute too early.
-       */
 
       return Math.max(
         0,
         Math.ceil(
-          liveEta
+          eta -
+          elapsed
         )
       );
+
     }
 
-
-    /*
-     * ========================================================
-     * UPDATE ETA EVERY SECOND
-     * ========================================================
-     */
 
     function updateEtaCountdown() {
 
@@ -2279,45 +2100,26 @@
 
       const container =
         document.getElementById(
-          'upcoming-container'
+          "upcoming-container"
         );
-
 
       if (!container) {
         return;
       }
 
 
-      const rawQueue =
-        window.__lastData.upcomingTrains;
-
-
       const queue =
-        Array.isArray(rawQueue)
-          ? rawQueue
-          : (
-              rawQueue &&
-              typeof rawQueue === 'object'
-                ? Object.values(rawQueue)
-                : []
-            );
+        window.__displayQueue || [];
 
 
-      if (
-        queue.length === 0
-      ) {
-        return;
-      }
-
-
-      const etaElements =
+      const elements =
         container.querySelectorAll(
-          '[data-eta-index]'
+          "[data-eta-index]"
         );
 
 
-      etaElements.forEach(
-        (element) => {
+      elements.forEach(
+        element => {
 
           const index =
             Number(
@@ -2327,7 +2129,6 @@
 
           const train =
             queue[index];
-
 
           if (!train) {
             return;
@@ -2349,12 +2150,12 @@
 
 
           element.innerText =
-            liveEta + 'm';
+            liveEta + "m";
 
 
           element.classList.remove(
-            'urgent',
-            'arriving'
+            "urgent",
+            "arriving"
           );
 
 
@@ -2363,7 +2164,7 @@
           ) {
 
             element.classList.add(
-              'arriving'
+              "arriving"
             );
 
           } else if (
@@ -2371,15 +2172,16 @@
           ) {
 
             element.classList.add(
-              'urgent'
+              "urgent"
             );
+
           }
 
 
           const sub =
             element.parentElement
               ?.querySelector(
-                '.eta-sub'
+                ".eta-sub"
               );
 
 
@@ -2390,13 +2192,12 @@
 
           const isTe =
             document.body.classList.contains(
-              'lang-te'
+              "lang-te"
             );
-
 
           const isHi =
             document.body.classList.contains(
-              'lang-hi'
+              "lang-hi"
             );
 
 
@@ -2404,30 +2205,28 @@
 
             sub.innerText =
               liveEta +
-              ' నిమిషాల్లో';
+              " నిమిషాల్లో";
 
           } else if (isHi) {
 
             sub.innerText =
               liveEta +
-              ' मिनट में';
+              " मिनट में";
 
           } else {
 
             sub.innerText =
-              'in ' +
+              "in " +
               liveEta +
-              ' mins';
+              " mins";
+
           }
 
         }
       );
+
     }
 
-
-    /*
-     * Run every second.
-     */
 
     setInterval(
       updateEtaCountdown,
@@ -2435,9 +2234,369 @@
     );
 
 
-    /* =====================================================
-       RENDER LIVE FIREBASE DATA
-       ===================================================== */
+    /* =========================================================
+       GATE RENDER
+       ========================================================= */
+
+    function renderGate(
+      gate,
+      prefix
+    ) {
+
+      const status =
+        safeText(
+          gate?.status ||
+          "OPEN"
+        ).toUpperCase();
+
+
+      const closed =
+        status === "CLOSED";
+
+      const warning =
+        status === "WARNING";
+
+
+      /* -------------------------------------------------------
+         STATUS TEXT
+         ------------------------------------------------------- */
+
+      let statusText;
+
+      const isTe =
+        document.body.classList.contains(
+          "lang-te"
+        );
+
+      const isHi =
+        document.body.classList.contains(
+          "lang-hi"
+        );
+
+
+      if (closed) {
+
+        statusText =
+          isTe
+            ? "ఆగండి"
+            : (
+                isHi
+                  ? "रुकें"
+                  : "STOP"
+              );
+
+      } else if (warning) {
+
+        statusText =
+          isTe
+            ? "జాగ్రత్త"
+            : (
+                isHi
+                  ? "सावधान"
+                  : "WARNING"
+              );
+
+      } else {
+
+        statusText =
+          isTe
+            ? "వెళ్ళండి"
+            : (
+                isHi
+                  ? "जाएं"
+                  : "GO"
+              );
+
+      }
+
+
+      /* -------------------------------------------------------
+         STATUS BADGE
+         ------------------------------------------------------- */
+
+      const statusElement =
+        document.getElementById(
+          prefix + "-gate-status"
+        );
+
+
+      if (statusElement) {
+
+        statusElement.className =
+          "gate-status " +
+          (
+            closed
+              ? "stop"
+              : (
+                  warning
+                    ? "warning"
+                    : "go"
+                )
+          );
+
+        statusElement.innerText =
+          statusText;
+
+      }
+
+
+      /* -------------------------------------------------------
+         LAMPS
+         ------------------------------------------------------- */
+
+      const red =
+        document.getElementById(
+          prefix + "-lamp-red"
+        );
+
+      const amber =
+        document.getElementById(
+          prefix + "-lamp-amber"
+        );
+
+      const green =
+        document.getElementById(
+          prefix + "-lamp-green"
+        );
+
+
+      if (red) {
+
+        red.className =
+          "lamp " +
+          (
+            closed
+              ? "red-on"
+              : ""
+          );
+
+      }
+
+
+      if (amber) {
+
+        amber.className =
+          "lamp " +
+          (
+            warning
+              ? "amber-on"
+              : ""
+          );
+
+      }
+
+
+      if (green) {
+
+        green.className =
+          "lamp " +
+          (
+            !closed &&
+            !warning
+              ? "green-on"
+              : ""
+          );
+
+      }
+
+
+      /* -------------------------------------------------------
+         BARRIERS
+         ------------------------------------------------------- */
+
+      const left =
+        document.getElementById(
+          prefix + "-arm-left"
+        );
+
+      const right =
+        document.getElementById(
+          prefix + "-arm-right"
+        );
+
+
+      if (left) {
+
+        left.className =
+          "barrier-arm arm-left " +
+          (
+            closed
+              ? "closed"
+              : "open"
+          );
+
+      }
+
+
+      if (right) {
+
+        right.className =
+          "barrier-arm arm-right " +
+          (
+            closed
+              ? "closed"
+              : "open"
+          );
+
+      }
+
+
+      /* -------------------------------------------------------
+         STOP SYMBOL
+         ------------------------------------------------------- */
+
+      const stopSymbol =
+        document.getElementById(
+          prefix + "-gate-stop-symbol"
+        );
+
+
+      if (stopSymbol) {
+
+        stopSymbol.classList.toggle(
+          "active",
+          closed
+        );
+
+      }
+
+
+      /* -------------------------------------------------------
+         TRAIN
+         ------------------------------------------------------- */
+
+      const trainElement =
+        document.getElementById(
+          prefix + "-train"
+        );
+
+
+      const activeTrain =
+        safeText(
+          gate?.activeTrain
+        );
+
+
+      const clearText =
+        isTe
+          ? "రైళ్లు ఏవీ లేవు"
+          : (
+              isHi
+                ? "ट्रैक खाली है"
+                : "Tracks Clear"
+            );
+
+
+      if (trainElement) {
+
+        trainElement.innerText =
+          (
+            !activeTrain ||
+            activeTrain
+              .toLowerCase()
+              .includes("tracks clear")
+          )
+            ? clearText
+            : activeTrain;
+
+      }
+
+
+      /* -------------------------------------------------------
+         WAIT
+         ------------------------------------------------------- */
+
+      const waitElement =
+        document.getElementById(
+          prefix + "-wait"
+        );
+
+
+      if (waitElement) {
+
+        waitElement.innerText =
+          Number(
+            gate?.waitMinutes || 0
+          ) + "m";
+
+
+        waitElement.style.color =
+          closed
+            ? "var(--red)"
+            : (
+                warning
+                  ? "var(--amber)"
+                  : "var(--text)"
+              );
+
+      }
+
+
+      /* -------------------------------------------------------
+         DISTANCE
+         ------------------------------------------------------- */
+
+      const distanceElement =
+        document.getElementById(
+          prefix + "-distance"
+        );
+
+
+      if (distanceElement) {
+
+        const distance =
+          Number(
+            gate?.gateDistanceKm
+          );
+
+
+        if (
+          Number.isFinite(distance)
+        ) {
+
+          distanceElement.innerText =
+            "Distance: " +
+            distance.toFixed(2) +
+            " km";
+
+
+          distanceElement.className =
+            "distance-line " +
+            (
+              closed
+                ? "distance-danger"
+                : (
+                    warning
+                      ? "distance-warning"
+                      : ""
+                  )
+            );
+
+        } else {
+
+          distanceElement.innerText =
+            "Distance: —";
+
+          distanceElement.className =
+            "distance-line";
+
+        }
+
+      }
+
+
+      return {
+        closed,
+        warning,
+        activeTrain
+      };
+
+    }
+
+
+    /* =========================================================
+       MAIN LIVE UI
+       ========================================================= */
 
     function renderLiveUI(data) {
 
@@ -2456,443 +2615,64 @@
         );
 
 
-      const isTe =
-        document.body.classList.contains(
-          'lang-te'
-        );
-
-
-      const isHi =
-        document.body.classList.contains(
-          'lang-hi'
-        );
-
-
-      const clearText =
-        isTe
-          ? 'రైళ్లు ఏవీ లేవు (క్లియర్)'
-          : (
-              isHi
-                ? 'ट्रैक खाली है'
-                : 'Tracks Clear'
-            );
-
-
       const mas =
         data.chennaiGate || {
-          status: 'OPEN',
+          status: "OPEN",
           waitMinutes: 0,
-          activeTrain: clearText
+          activeTrain: "Tracks Clear"
         };
 
 
       const tpty =
         data.tirupatiGate || {
-          status: 'OPEN',
+          status: "OPEN",
           waitMinutes: 0,
-          activeTrain: clearText
+          activeTrain: "Tracks Clear"
         };
 
 
-      /* =====================================================
-         CHENNAI GATE
-         ===================================================== */
-
-      const masClosed =
-        safeText(
-          mas.status
-        ).toUpperCase() === 'CLOSED';
-
-
-      const masRed =
-        document.getElementById(
-          'mas-lamp-red'
+      const masState =
+        renderGate(
+          mas,
+          "mas"
         );
 
 
-      const masGreen =
-        document.getElementById(
-          'mas-lamp-green'
+      const tptyState =
+        renderGate(
+          tpty,
+          "tpty"
         );
 
 
-      if (masRed) {
-
-        masRed.className =
-          'lamp ' +
-          (
-            masClosed
-              ? 'red-on'
-              : ''
-          );
-      }
-
-
-      if (masGreen) {
-
-        masGreen.className =
-          'lamp ' +
-          (
-            !masClosed
-              ? 'green-on'
-              : ''
-          );
-      }
-
-
-      const masLeft =
-        document.getElementById(
-          'mas-arm-left'
-        );
-
-
-      const masRight =
-        document.getElementById(
-          'mas-arm-right'
-        );
-
-
-      if (masLeft) {
-
-        masLeft.className =
-          'barrier-arm arm-left ' +
-          (
-            masClosed
-              ? 'closed'
-              : 'open'
-          );
-      }
-
-
-      if (masRight) {
-
-        masRight.className =
-          'barrier-arm arm-right ' +
-          (
-            masClosed
-              ? 'closed'
-              : 'open'
-          );
-      }
-
-
-      const masStopSymbol =
-        document.getElementById(
-          'mas-gate-stop-symbol'
-        );
-
-
-      if (masStopSymbol) {
-
-        masStopSymbol.classList.toggle(
-          'active',
-          masClosed
-        );
-      }
-
-
-      const masStatus =
-        document.getElementById(
-          'mas-gate-status'
-        );
-
-
-      if (masStatus) {
-
-        masStatus.className =
-          'gate-status ' +
-          (
-            masClosed
-              ? 'stop'
-              : 'go'
-          );
-
-
-        masStatus.innerText =
-          masClosed
-            ? (
-                isTe
-                  ? 'ఆగండి'
-                  : (
-                      isHi
-                        ? 'रुकें'
-                        : 'STOP'
-                    )
-              )
-            : (
-                isTe
-                  ? 'వెళ్ళండి'
-                  : (
-                      isHi
-                        ? 'जाएं'
-                        : 'GO'
-                    )
-              );
-      }
-
-
-      const masTrain =
-        document.getElementById(
-          'mas-train'
-        );
-
-
-      const masActiveTrain =
-        safeText(
-          mas.activeTrain
-        );
-
-
-      if (masTrain) {
-
-        masTrain.innerText =
-          (
-            !masActiveTrain ||
-            masActiveTrain
-              .toLowerCase()
-              .includes('tracks clear')
-          )
-            ? clearText
-            : masActiveTrain;
-      }
-
-
-      const masWait =
-        document.getElementById(
-          'mas-wait'
-        );
-
-
-      if (masWait) {
-
-        masWait.innerText =
-          Number(
-            mas.waitMinutes || 0
-          ) + 'm';
-
-
-        masWait.style.color =
-          masClosed
-            ? 'var(--red)'
-            : 'var(--text)';
-      }
-
-
-      /* =====================================================
-         TIRUPATI GATE
-         ===================================================== */
-
-      const tptyClosed =
-        safeText(
-          tpty.status
-        ).toUpperCase() === 'CLOSED';
-
-
-      const tptyRed =
-        document.getElementById(
-          'tpty-lamp-red'
-        );
-
-
-      const tptyGreen =
-        document.getElementById(
-          'tpty-lamp-green'
-        );
-
-
-      if (tptyRed) {
-
-        tptyRed.className =
-          'lamp ' +
-          (
-            tptyClosed
-              ? 'red-on'
-              : ''
-          );
-      }
-
-
-      if (tptyGreen) {
-
-        tptyGreen.className =
-          'lamp ' +
-          (
-            !tptyClosed
-              ? 'green-on'
-              : ''
-          );
-      }
-
-
-      const tptyLeft =
-        document.getElementById(
-          'tpty-arm-left'
-        );
-
-
-      const tptyRight =
-        document.getElementById(
-          'tpty-arm-right'
-        );
-
-
-      if (tptyLeft) {
-
-        tptyLeft.className =
-          'barrier-arm arm-left ' +
-          (
-            tptyClosed
-              ? 'closed'
-              : 'open'
-          );
-      }
-
-
-      if (tptyRight) {
-
-        tptyRight.className =
-          'barrier-arm arm-right ' +
-          (
-            tptyClosed
-              ? 'closed'
-              : 'open'
-          );
-      }
-
-
-      const tptyStopSymbol =
-        document.getElementById(
-          'tpty-gate-stop-symbol'
-        );
-
-
-      if (tptyStopSymbol) {
-
-        tptyStopSymbol.classList.toggle(
-          'active',
-          tptyClosed
-        );
-      }
-
-
-      const tptyStatus =
-        document.getElementById(
-          'tpty-gate-status'
-        );
-
-
-      if (tptyStatus) {
-
-        tptyStatus.className =
-          'gate-status ' +
-          (
-            tptyClosed
-              ? 'stop'
-              : 'go'
-          );
-
-
-        tptyStatus.innerText =
-          tptyClosed
-            ? (
-                isTe
-                  ? 'ఆగండి'
-                  : (
-                      isHi
-                        ? 'रुकें'
-                        : 'STOP'
-                    )
-              )
-            : (
-                isTe
-                  ? 'వెళ్ళండి'
-                  : (
-                      isHi
-                        ? 'जाएं'
-                        : 'GO'
-                    )
-              );
-      }
-
-
-      const tptyTrain =
-        document.getElementById(
-          'tpty-train'
-        );
-
-
-      const tptyActiveTrain =
-        safeText(
-          tpty.activeTrain
-        );
-
-
-      if (tptyTrain) {
-
-        tptyTrain.innerText =
-          (
-            !tptyActiveTrain ||
-            tptyActiveTrain
-              .toLowerCase()
-              .includes('tracks clear')
-          )
-            ? clearText
-            : tptyActiveTrain;
-      }
-
-
-      const tptyWait =
-        document.getElementById(
-          'tpty-wait'
-        );
-
-
-      if (tptyWait) {
-
-        tptyWait.innerText =
-          Number(
-            tpty.waitMinutes || 0
-          ) + 'm';
-
-
-        tptyWait.style.color =
-          tptyClosed
-            ? 'var(--red)'
-            : 'var(--text)';
-      }
-
-
-      /* =====================================================
-         ADVISORY
-         ===================================================== */
+      /* =======================================================
+         TRAFFIC ADVISORY
+         ======================================================== */
 
       const card =
         document.getElementById(
-          'decision-card'
+          "decision-card"
         );
 
-
-      const statusBadge =
+      const badge =
         document.getElementById(
-          'decision-status'
+          "decision-status"
         );
-
 
       const title =
         document.getElementById(
-          'decision-title'
+          "decision-title"
         );
-
 
       const text =
         document.getElementById(
-          'decision-text'
+          "decision-text"
         );
 
 
       if (
         !card ||
-        !statusBadge ||
+        !badge ||
         !title ||
         !text
       ) {
@@ -2900,11 +2680,21 @@
       }
 
 
+      const isTe =
+        document.body.classList.contains(
+          "lang-te"
+        );
+
+      const isHi =
+        document.body.classList.contains(
+          "lang-hi"
+        );
+
+
       const masActive =
         safeText(
           mas.activeTrain
         );
-
 
       const tptyActive =
         safeText(
@@ -2912,183 +2702,301 @@
         );
 
 
+      /* -------------------------------------------------------
+         BOTH CLOSED
+         ------------------------------------------------------- */
+
       if (
-        masClosed &&
-        !tptyClosed
+        masState.closed &&
+        tptyState.closed
       ) {
 
         card.className =
-          'decision-hub warning';
+          "decision-hub danger";
 
-
-        statusBadge.innerText =
+        badge.innerText =
           isTe
-            ? 'చెన్నై గేట్ క్లోజ్'
+            ? "రెండు గేట్లు క్లోజ్"
             : (
                 isHi
-                  ? 'चेन्नई फाटक बंद'
-                  : 'AVOID CHENNAI GATE'
+                  ? "दोनों फाटक बंद"
+                  : "STOP"
               );
 
-
-        statusBadge.style.color =
-          'var(--amber)';
+        badge.style.color =
+          "var(--red)";
 
 
         title.innerText =
           isTe
-            ? 'తిరుపతి గేట్ బైపాస్ వైపు వెళ్ళండి'
+            ? "రెండు గేట్లు మూసివేయబడ్డాయి"
             : (
                 isHi
-                  ? 'तिरुपति फाटक बाईपास से जाएं'
-                  : 'Use Tirupati Gate Route'
+                  ? "दोनों फाटक बंद हैं"
+                  : "Both Gates Are Closed"
               );
 
 
         text.innerText =
           isTe
-            ? `చెన్నై లైన్‌లో రైలు (${masActive}) వస్తోంది. తిరుపతి గేట్ రూట్ తీసుకోండి.`
+            ? `రైళ్లు సమీపంలో ఉన్నాయి. దయచేసి వేచి ఉండండి.`
             : (
                 isHi
-                  ? `चेन्नई लाइन पर ट्रेन (${masActive}) आ रही है। तिरुपति फाटक मार्ग अपनाएं।`
-                  : `Train approaching on Chennai line (${masActive}). Use Tirupati crossing.`
+                  ? "ट्रेनें पास हैं। कृपया प्रतीक्षा करें।"
+                  : "Trains are crossing near Gudur Junction. Please wait."
               );
+
       }
+
+
+      /* -------------------------------------------------------
+         MAS CLOSED
+         ------------------------------------------------------- */
 
       else if (
-        tptyClosed &&
-        !masClosed
+        masState.closed
       ) {
 
         card.className =
-          'decision-hub warning';
+          "decision-hub danger";
 
-
-        statusBadge.innerText =
+        badge.innerText =
           isTe
-            ? 'తిరుపతి గేట్ క్లోజ్'
+            ? "చెన్నై గేట్ మూసివేసింది"
             : (
                 isHi
-                  ? 'तिरुपति फाटक बंद'
-                  : 'AVOID TIRUPATI GATE'
+                  ? "चेन्नई फाटक बंद"
+                  : "CHENNAI GATE CLOSED"
               );
 
-
-        statusBadge.style.color =
-          'var(--amber)';
+        badge.style.color =
+          "var(--red)";
 
 
         title.innerText =
           isTe
-            ? 'చెన్నై గేట్ మీదుగా ప్రయాణించండి'
+            ? "తిరుపతి గేట్ రూట్ ఉపయోగించండి"
             : (
                 isHi
-                  ? 'चेन्नई मुख्य फाटक से जाएं'
-                  : 'Use Chennai Main Gate'
+                  ? "तिरुपति फाटक मार्ग अपनाएं"
+                  : "Use Tirupati Gate Route"
               );
 
 
         text.innerText =
           isTe
-            ? `తిరుపతి లైన్‌లో రైలు (${tptyActive}) వస్తోంది. చెన్నై మెయిన్ గేట్ ప్రస్తుతం తెరిచి ఉంది.`
+            ? `చెన్నై మార్గంలో ${masActive} వస్తోంది.`
             : (
                 isHi
-                  ? `तिरुपति मार्ग पर ट्रेन (${tptyActive}) आ रही है। चेन्नई मुख्य फाटक खुला है।`
-                  : `Tirupati crossing halted by ${tptyActive}. Chennai mainline is clear.`
+                  ? `चेन्नई मार्ग पर ${masActive} आ रही है।`
+                  : `Train ${masActive} is approaching the Chennai crossing.`
               );
+
       }
+
+
+      /* -------------------------------------------------------
+         TPTY CLOSED
+         ------------------------------------------------------- */
 
       else if (
-        masClosed &&
-        tptyClosed
+        tptyState.closed
       ) {
 
         card.className =
-          'decision-hub danger';
+          "decision-hub danger";
 
-
-        statusBadge.innerText =
+        badge.innerText =
           isTe
-            ? 'రెండు గేట్లు క్లోజ్'
+            ? "తిరుపతి గేట్ మూసివేసింది"
             : (
                 isHi
-                  ? 'दोनों फाटक बंद'
-                  : 'GRIDLOCK ALERT'
+                  ? "तिरुपति फाटक बंद"
+                  : "TIRUPATI GATE CLOSED"
               );
 
-
-        statusBadge.style.color =
-          'var(--red)';
+        badge.style.color =
+          "var(--red)";
 
 
         title.innerText =
           isTe
-            ? 'తీవ్రమైన ట్రాఫిక్ జామ్ అవకాశం ఉంది'
+            ? "చెన్నై గేట్ రూట్ ఉపయోగించండి"
             : (
                 isHi
-                  ? 'भारी जाम की संभावना'
-                  : 'Both Gates Are Closed'
+                  ? "चेन्नई मुख्य फाटक से जाएं"
+                  : "Use Chennai Main Gate"
               );
 
 
         text.innerText =
           isTe
-            ? 'రెండు వైపులా రైళ్లు వస్తున్నాయి. దయచేసి వేచి ఉండండి.'
+            ? `తిరుపతి మార్గంలో ${tptyActive} వస్తోంది.`
             : (
                 isHi
-                  ? 'दोनों दिशाओं से ट्रेनें आ रही हैं। कृपया प्रतीक्षा करें.'
-                  : 'Multiple trains crossing Gudur Junction. Expect delays.'
+                  ? `तिरुपति मार्ग पर ${tptyActive} आ रही है।`
+                  : `Train ${tptyActive} is approaching the Tirupati crossing.`
               );
+
       }
+
+
+      /* -------------------------------------------------------
+         MAS WARNING
+         ------------------------------------------------------- */
+
+      else if (
+        masState.warning
+      ) {
+
+        card.className =
+          "decision-hub warning";
+
+        badge.innerText =
+          isTe
+            ? "చెన్నై గేట్ హెచ్చరిక"
+            : (
+                isHi
+                  ? "चेन्नई फाटक चेतावनी"
+                  : "WARNING"
+              );
+
+        badge.style.color =
+          "var(--amber)";
+
+
+        title.innerText =
+          isTe
+            ? "చెన్నై గేట్ త్వరలో మూసివేయబడుతుంది"
+            : (
+                isHi
+                  ? "चेन्नई फाटक जल्द बंद होगा"
+                  : "Chennai Gate Will Close Soon"
+              );
+
+
+        text.innerText =
+          isTe
+            ? `రైలు ${masActive} గేట్‌కు 1 కి.మీ లోపల ఉంది.`
+            : (
+                isHi
+                  ? `ट्रेन ${masActive} फाटक से 1 किमी के अंदर है।`
+                  : `Train ${masActive} is within 1 km of the Chennai crossing. Gate will close soon.`
+              );
+
+      }
+
+
+      /* -------------------------------------------------------
+         TPTY WARNING
+         ------------------------------------------------------- */
+
+      else if (
+        tptyState.warning
+      ) {
+
+        card.className =
+          "decision-hub warning";
+
+        badge.innerText =
+          isTe
+            ? "తిరుపతి గేట్ హెచ్చరిక"
+            : (
+                isHi
+                  ? "तिरुपति फाटक चेतावनी"
+                  : "WARNING"
+              );
+
+        badge.style.color =
+          "var(--amber)";
+
+
+        title.innerText =
+          isTe
+            ? "తిరుపతి గేట్ త్వరలో మూసివేయబడుతుంది"
+            : (
+                isHi
+                  ? "तिरुपति फाटक जल्द बंद होगा"
+                  : "Tirupati Gate Will Close Soon"
+              );
+
+
+        text.innerText =
+          isTe
+            ? `రైలు ${tptyActive} గేట్‌కు 1 కి.మీ లోపల ఉంది.`
+            : (
+                isHi
+                  ? `ट्रेन ${tptyActive} फाटक से 1 किमी के अंदर है।`
+                  : `Train ${tptyActive} is within 1 km of the Tirupati crossing. Gate will close soon.`
+              );
+
+      }
+
+
+      /* -------------------------------------------------------
+         BOTH OPEN
+         ------------------------------------------------------- */
 
       else {
 
         card.className =
-          'decision-hub';
+          "decision-hub";
 
-
-        statusBadge.innerText =
+        badge.innerText =
           isTe
-            ? 'క్లియర్'
+            ? "క్లియర్"
             : (
                 isHi
-                  ? 'रास्ता साफ'
-                  : 'CLEAR'
+                  ? "रास्ता साफ"
+                  : "CLEAR"
               );
 
-
-        statusBadge.style.color =
-          'var(--green)';
+        badge.style.color =
+          "var(--green)";
 
 
         title.innerText =
           isTe
-            ? 'రెండు గేట్లు తెరిచి ఉన్నాయి'
+            ? "రెండు గేట్లు తెరిచి ఉన్నాయి"
             : (
                 isHi
-                  ? 'दोनों फाटक खुले हैं'
-                  : 'Both Crossings Are Open'
+                  ? "दोनों फाटक खुले हैं"
+                  : "Both Crossings Are Open"
               );
 
 
         text.innerText =
           isTe
-            ? 'రైళ్లు ఏవీ సమీపంలో లేవు. ప్రయాణం సురక్షితం.'
+            ? "ధృవీకరించబడిన సమీప రైలు లేదు."
             : (
                 isHi
-                  ? 'आस-पास कोई ट्रेन नहीं है। आवागमन सुरक्षित है.'
-                  : 'No verified trains are currently approaching Gudur Junction.'
+                  ? "कोई सत्यापित ट्रेन पास नहीं है।"
+                  : "No verified train is currently inside the crossing warning zone."
               );
+
       }
 
 
-      /* =====================================================
+      /* =======================================================
          UPCOMING TRAINS
-         ===================================================== */
+         ======================================================== */
+
+      renderUpcoming(
+        data
+      );
+
+    }
+
+
+    /* =========================================================
+       UPCOMING TRAINS
+       ========================================================= */
+
+    function renderUpcoming(data) {
 
       const container =
         document.getElementById(
-          'upcoming-container'
+          "upcoming-container"
         );
 
 
@@ -3097,104 +3005,100 @@
       }
 
 
-      const rawQueue =
+      const raw =
         data.upcomingTrains;
 
 
       const queue =
-        Array.isArray(rawQueue)
-          ? rawQueue
+        Array.isArray(raw)
+          ? raw
           : (
-              rawQueue &&
-              typeof rawQueue === 'object'
-                ? Object.values(rawQueue)
+              raw &&
+              typeof raw === "object"
+                ? Object.values(raw)
                 : []
             );
 
 
       if (
-        !queue ||
         queue.length === 0
       ) {
 
-        container.innerHTML = `
+        window.__displayQueue =
+          [];
 
+        container.innerHTML = `
           <div class="upcoming-empty">
 
             ${
-              isTe
-                ? '📍 ధృవీకరించబడిన సమీప రైళ్లు లేవు.'
+              document.body.classList.contains("lang-te")
+                ? "📍 ధృవీకరించబడిన సమీప రైళ్లు లేవు."
                 : (
-                    isHi
-                      ? '📍 कोई सत्यापित आने वाली ट्रेन नहीं है.'
-                      : '📍 No verified approaching trains.'
+                    document.body.classList.contains("lang-hi")
+                      ? "📍 कोई सत्यापित आने वाली ट्रेन नहीं है."
+                      : "📍 No verified approaching trains."
                   )
             }
 
           </div>
-
         `;
 
         return;
+
       }
 
 
-      /*
-       * IMPORTANT:
-       *
-       * Keep the original queue order from Firebase.
-       *
-       * This ensures the data-eta-index used by the
-       * one-second countdown points to the correct train.
-       */
+      const sorted =
+        [...queue].sort(
+          (a,b) =>
+            Number(
+              a.etaMinutes ?? 9999
+            ) -
+            Number(
+              b.etaMinutes ?? 9999
+            )
+        );
 
-      const sortedQueue =
-        [...queue]
-          .sort(
-            (a, b) =>
-              Number(
-                a.etaMinutes ?? 9999
-              ) -
-              Number(
-                b.etaMinutes ?? 9999
-              )
-          );
-
-
-      /*
-       * Save the queue actually being displayed.
-       *
-       * The countdown will use this same sorted queue.
-       */
 
       window.__displayQueue =
-        sortedQueue;
+        sorted;
+
+
+      const isTe =
+        document.body.classList.contains(
+          "lang-te"
+        );
+
+      const isHi =
+        document.body.classList.contains(
+          "lang-hi"
+        );
 
 
       container.innerHTML =
-        sortedQueue
+        sorted
           .map(
-            (t, index) => {
+            (train,index) => {
 
               const trainNo =
                 safeText(
-                  t.trainNo ||
-                  t.trainNumber ||
-                  t.number ||
-                  '----'
+                  train.trainNo ||
+                  train.trainNumber ||
+                  train.number ||
+                  "----"
                 );
 
 
-              const trainName =
+              const name =
                 safeText(
-                  t.name ||
-                  'Unknown Train'
+                  train.name ||
+                  "Unknown Train"
                 );
 
 
               const eta =
                 Number(
-                  t.etaMinutes
+                  train.etaMinutes
                 );
 
 
@@ -3202,63 +3106,80 @@
                 Number.isFinite(eta)
                   ? Math.max(
                       0,
-                      Math.ceil(
-                        eta
-                      )
+                      Math.ceil(eta)
                     )
-                  : '--';
+                  : null;
 
 
               const delay =
                 Number(
-                  t.delayMinutes || 0
+                  train.delayMinutes || 0
                 );
-
-
-              const delayText =
-                delay > 0
-                  ? `${delay}m late`
-                  : 'On Time';
 
 
               const corridor =
                 safeText(
-                  t.corridor
+                  train.corridor
                 ).toUpperCase();
 
 
               const isMas =
-                corridor === 'MAS';
-
+                corridor === "MAS";
 
               const isTpty =
-                corridor === 'TPTY';
+                corridor === "TPTY";
 
 
               const corridorLabel =
                 isMas
-                  ? 'MAS LINE'
+                  ? "MAS LINE"
                   : (
                       isTpty
-                        ? 'TPTY LINE'
-                        : 'OTHER LINE'
+                        ? "TPTY LINE"
+                        : "OTHER"
                     );
 
 
               const corridorClass =
                 isMas
-                  ? 'corridor-mas'
+                  ? "corridor-mas"
                   : (
                       isTpty
-                        ? 'corridor-tpty'
-                        : 'corridor-other'
+                        ? "corridor-tpty"
+                        : ""
                     );
 
 
-              const platform =
-                safeText(
-                  t.platform || '—'
+              const distance =
+                Number(
+                  train.distanceToGateKm
                 );
+
+
+              let distanceText =
+                "";
+
+
+              if (
+                Number.isFinite(distance)
+              ) {
+
+                distanceText =
+                  " • " +
+                  distance.toFixed(2) +
+                  " km";
+
+              }
+
+
+              const gateState =
+                train.gateClosed
+                  ? " • STOP"
+                  : (
+                      train.gateWarning
+                        ? " • WARNING"
+                        : ""
+                    );
 
 
               return `
@@ -3271,31 +3192,49 @@
 
                       ${escapeHtml(trainNo)}
                       •
-                      ${escapeHtml(trainName)}
+                      ${escapeHtml(name)}
 
                     </div>
+
 
                     <div class="train-sub">
 
                       <span
                         class="corridor-pill ${corridorClass}"
                       >
-
                         ${corridorLabel}
-
                       </span>
 
-                      <span>
-                        • PF ${escapeHtml(platform)}
-                      </span>
 
                       <span>
-                        • ${escapeHtml(delayText)}
+                        • PF ${escapeHtml(
+                          train.platform || "—"
+                        )}
+                      </span>
+
+
+                      <span>
+                        ${
+                          delay > 0
+                            ? `${delay}m late`
+                            : "On Time"
+                        }
+                      </span>
+
+
+                      <span>
+                        ${distanceText}
+                      </span>
+
+
+                      <span>
+                        ${gateState}
                       </span>
 
                     </div>
 
                   </div>
+
 
                   <div class="eta-col">
 
@@ -3303,18 +3242,29 @@
                       class="eta-min"
                       data-eta-index="${index}"
                     >
-                      ${safeEta}m
+
+                      ${
+                        safeEta === null
+                          ? "--"
+                          : safeEta + "m"
+                      }
+
                     </div>
+
 
                     <div class="eta-sub">
 
                       ${
-                        isTe
-                          ? `${safeEta} నిమిషాల్లో`
+                        safeEta === null
+                          ? "live"
                           : (
-                              isHi
-                                ? `${safeEta} मिनट में`
-                                : `in ${safeEta} mins`
+                              isTe
+                                ? `${safeEta} నిమిషాల్లో`
+                                : (
+                                    isHi
+                                      ? `${safeEta} मिनट में`
+                                      : `in ${safeEta} mins`
+                                  )
                             )
                       }
 
@@ -3325,9 +3275,10 @@
                 </div>
 
               `;
+
             }
           )
-          .join('');
+          .join("");
 
 
       updateEtaCountdown();
@@ -3335,193 +3286,154 @@
     }
 
 
-    function escapeHtml(value) {
-
-      return String(value)
-        .replace(
-          /&/g,
-          '&amp;'
-        )
-        .replace(
-          /</g,
-          '&lt;'
-        )
-        .replace(
-          />/g,
-          '&gt;'
-        )
-        .replace(
-          /"/g,
-          '&quot;'
-        )
-        .replace(
-          /'/g,
-          '&#039;'
-        );
-    }
-
+    /* =========================================================
+       INITIAL THEME / LANGUAGE
+       ========================================================= */
 
     document.addEventListener(
-      'DOMContentLoaded',
-      function () {
+      "DOMContentLoaded",
+      () => {
+
+        const savedTheme =
+          localStorage.getItem(
+            "gdr-theme"
+          ) || "dark";
+
+
+        applyTheme(
+          savedTheme
+        );
+
 
         const savedLanguage =
           localStorage.getItem(
-            'gdr-language'
-          );
+            "gdr-language"
+          ) || "en";
 
 
-        if (
-          savedLanguage &&
-          ['en', 'te', 'hi']
-            .includes(savedLanguage)
-        ) {
-
-          setAppLanguage(
-            savedLanguage
-          );
-
-        } else {
-
-          setAppLanguage(
-            'en'
-          );
-
-        }
+        setAppLanguage(
+          savedLanguage
+        );
 
       }
     );
 
-  </script>
 
-
-  <script
-    src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"
-  ></script>
-
-  <script
-    src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"
-  ></script>
-
-
-  <script>
+    /* =========================================================
+       FIREBASE
+       ========================================================= */
 
     try {
 
       firebase.initializeApp({
 
         databaseURL:
-          'https://gudur-gate-tracker-default-rtdb.firebaseio.com'
+          "https://gudur-gate-tracker-default-rtdb.firebaseio.com"
 
       });
 
 
-      const gateDatabase =
+      const database =
         firebase.database();
 
 
       const gateReference =
-        gateDatabase.ref(
-          'gudur_gates'
+        database.ref(
+          "gudur_gates"
         );
 
 
       gateReference.on(
-        'value',
+        "value",
 
-        (snap) => {
+        snapshot => {
 
-          const val =
-            snap.val();
+          const data =
+            snapshot.val();
 
 
-          if (!val) {
-
-            console.warn(
-              'Firebase: gudur_gates is empty.'
-            );
-
+          if (!data) {
 
             renderLiveUI({
 
               chennaiGate: {
-                status: 'OPEN',
+                status: "OPEN",
                 waitMinutes: 0,
-                activeTrain: 'Tracks Clear'
+                activeTrain: "Tracks Clear"
               },
 
               tirupatiGate: {
-                status: 'OPEN',
+                status: "OPEN",
                 waitMinutes: 0,
-                activeTrain: 'Tracks Clear'
+                activeTrain: "Tracks Clear"
               },
 
               upcomingTrains: [],
 
               lastUpdated:
-                'No live data'
+                "No live data"
 
             });
 
 
-            const syncElem =
+            const sync =
               document.getElementById(
-                'sync-stamp'
+                "sync-stamp"
               );
 
 
-            if (syncElem) {
-
-              syncElem.innerText =
-                'No data';
-
+            if (sync) {
+              sync.innerText =
+                "No data";
             }
 
 
             return;
+
           }
 
 
           renderLiveUI(
-            val
+            data
           );
 
 
-          const syncElem =
+          const sync =
             document.getElementById(
-              'sync-stamp'
+              "sync-stamp"
             );
 
 
-          if (syncElem) {
+          if (sync) {
 
-            syncElem.innerText =
-              val.lastUpdated ||
-              val.lastUpdatedLocal ||
-              'Live';
+            sync.innerText =
+              data.lastUpdated ||
+              data.lastUpdatedDisplay ||
+              "Live";
 
           }
 
         },
 
-        (error) => {
+
+        error => {
 
           console.error(
-            'Firebase read error:',
+            "Firebase read error:",
             error
           );
 
 
-          const syncElem =
+          const sync =
             document.getElementById(
-              'sync-stamp'
+              "sync-stamp"
             );
 
 
-          if (syncElem) {
+          if (sync) {
 
-            syncElem.innerText =
-              'Connection error';
+            sync.innerText =
+              "Connection error";
 
           }
 
@@ -3530,24 +3442,24 @@
       );
 
 
-    } catch (e) {
+    } catch (error) {
 
       console.error(
-        'Firebase initialization error:',
-        e
+        "Firebase initialization error:",
+        error
       );
 
 
-      const syncElem =
+      const sync =
         document.getElementById(
-          'sync-stamp'
+          "sync-stamp"
         );
 
 
-      if (syncElem) {
+      if (sync) {
 
-        syncElem.innerText =
-          'Firebase error';
+        sync.innerText =
+          "Firebase error";
 
       }
 
