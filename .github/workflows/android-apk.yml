@@ -16,24 +16,25 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Capacitor
-        run: |
-          npm install @capacitor/core @capacitor/cli
-          npm install @capacitor/android
+      - name: Install dependencies
+        run: npm install
 
-      - name: Create Capacitor project
-        run: |
-          npx cap init "GDR Crossing Radar" "com.gudurgate.tracker" --web-dir=www
-
-      - name: Prepare website
+      - name: Create web directory
         run: |
           mkdir -p www
           cp index.html www/index.html
 
-      - name: Add Android platform
+      - name: Install Capacitor
+        run: |
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: Initialize Capacitor
+        run: npx cap init "GDR Crossing Radar" "com.gudurgate.tracker" --web-dir=www
+
+      - name: Add Android
         run: npx cap add android
 
-      - name: Sync Android project
+      - name: Sync Capacitor
         run: npx cap sync android
 
       - name: Setup Java
@@ -44,9 +45,7 @@ jobs:
 
       - name: Build APK
         working-directory: android
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug
+        run: ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
