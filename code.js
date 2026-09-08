@@ -1,4 +1,3 @@
-```js
 // ============================================================
 // GUDUR GATE TRACKER
 // RailRadar + Firebase
@@ -2716,4 +2715,3 @@ updateGateSystem()
 
     process.exitCode = 1;
   });
-```
