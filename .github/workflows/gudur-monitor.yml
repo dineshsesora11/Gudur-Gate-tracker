@@ -12,7 +12,9 @@ concurrency:
 jobs:
   monitor:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+
+    # Give the monitor enough time to finish.
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
@@ -24,7 +26,7 @@ jobs:
           node-version: 24
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-audit --no-fund
 
       - name: Run Gudur Gate Monitor
         env:
