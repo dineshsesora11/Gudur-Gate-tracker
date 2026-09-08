@@ -1,3 +1,4 @@
+```js
 // ============================================================
 // GUDUR GATE TRACKER
 // RailRadar + Firebase
@@ -95,6 +96,12 @@ const CLOSE_DISTANCE_KM = 3.00;
 
 // Informational only.
 const CLEAR_DISTANCE_KM = 0.80;
+
+// Minimum time a gate remains CLOSED after the monitor first detects
+// a train at or inside the 3 km closing distance. This is persisted
+// in Firebase so it survives separate GitHub Actions runs.
+const GATE_HOLD_MINUTES = 15;
+const GATE_HOLD_MS = GATE_HOLD_MINUTES * 60 * 1000;
 
 // ============================================================
 // UPCOMING TRAIN SETTINGS
@@ -429,13 +436,6 @@ function isDeparted(
 // ============================================================
 // ARRIVAL TIME
 // ============================================================
-//
-// IMPORTANT:
-//
-// For a GDR station-board record, prefer the GDR stop time.
-// RailRadar's live expected arrival is only a fallback.
-//
-// ============================================================
 
 function getArrivalTime(
   train,
@@ -506,20 +506,6 @@ function getPlatform(
 // ============================================================
 // BOARD ETA
 // ============================================================
-//
-// Priority:
-//
-// 1. If actually at GDR -> 0
-//
-// 2. Plain scheduled GDR arrival time
-//    + delay
-//
-// 3. RailRadar expected live arrival
-//    WITHOUT adding delay again
-//
-// 4. Direct ETA field
-//
-// ============================================================
 
 function calculateBoardEta(
   train,
@@ -554,7 +540,7 @@ function calculateBoardEta(
     );
 
   // ----------------------------------------------------------
-  // 1. SCHEDULED GDR STOP TIME
+  // SCHEDULED GDR STOP TIME
   // ----------------------------------------------------------
 
   const scheduledArrival =
@@ -578,8 +564,6 @@ function calculateBoardEta(
           currentMinutes
         );
 
-      // A small negative value means the train is
-      // effectively due now.
       if (
         diff < 0 &&
         diff > -60
@@ -595,12 +579,7 @@ function calculateBoardEta(
   }
 
   // ----------------------------------------------------------
-  // 2. LIVE EXPECTED ARRIVAL
-  // ----------------------------------------------------------
-  //
-  // DO NOT add delay here.
-  //
-  // RailRadar's expectedArrivalTime is already expected time.
+  // LIVE EXPECTED ARRIVAL
   // ----------------------------------------------------------
 
   const expectedArrival =
@@ -639,7 +618,7 @@ function calculateBoardEta(
   }
 
   // ----------------------------------------------------------
-  // 3. DIRECT ETA
+  // DIRECT ETA
   // ----------------------------------------------------------
 
   const directEta =
@@ -939,16 +918,6 @@ function interpolatePosition(
 // ============================================================
 // LIVE TRAIN POSITION
 // ============================================================
-//
-// RailRadar may provide:
-//
-// currentLocation.segmentProgress
-//
-// but not direct lat/lng.
-//
-// Therefore we interpolate between route stations.
-//
-// ============================================================
 
 function getLiveTrainPosition(
   liveData
@@ -1174,19 +1143,6 @@ function getLiveTrainPosition(
 // ============================================================
 // DETERMINE GATE CORRIDOR FROM LIVE ROUTE
 // ============================================================
-//
-// We determine the approach side from the station immediately
-// before Gudur.
-//
-// TPTY side:
-//
-// Venkatagiri -> GDR
-//
-// MAS side:
-//
-// Nayudupeta -> GDR
-//
-// ============================================================
 
 function determineCorridorFromLiveRoute(
   liveData,
@@ -1320,11 +1276,6 @@ function determineCorridorFromLiveRoute(
 // ============================================================
 // FALLBACK DISPLAY CORRIDOR
 // ============================================================
-//
-// This is ONLY a display hint.
-// Gate control NEVER relies on it.
-//
-// ============================================================
 
 function determineBoardDisplayCorridor(
   train,
@@ -1371,14 +1322,6 @@ function determineBoardDisplayCorridor(
 
 // ============================================================
 // BUILD UPCOMING LIST
-// ============================================================
-//
-// IMPORTANT:
-//
-// All actual GDR board trains remain visible.
-//
-// Unknown corridor = OTHER.
-//
 // ============================================================
 
 function buildUpcomingFromBoard(
@@ -1527,10 +1470,6 @@ function buildUpcomingFromBoard(
         )
     });
   }
-
-  // ----------------------------------------------------------
-  // SORT
-  // ----------------------------------------------------------
 
   upcoming.sort(
     (a, b) => {
@@ -1720,10 +1659,6 @@ async function processLiveCandidate(
     return null;
   }
 
-  // ----------------------------------------------------------
-  // LIVE POSITION
-  // ----------------------------------------------------------
-
   const positionInfo =
     getLiveTrainPosition(
       liveData
@@ -1736,10 +1671,6 @@ async function processLiveCandidate(
 
     return null;
   }
-
-  // ----------------------------------------------------------
-  // MUST BE BEFORE GUDUR
-  // ----------------------------------------------------------
 
   if (
     positionInfo.inbound === false
@@ -1772,10 +1703,6 @@ async function processLiveCandidate(
     return null;
   }
 
-  // ----------------------------------------------------------
-  // CORRIDOR
-  // ----------------------------------------------------------
-
   const corridor =
     determineCorridorFromLiveRoute(
       liveData,
@@ -1790,18 +1717,10 @@ async function processLiveCandidate(
     return null;
   }
 
-  // ----------------------------------------------------------
-  // SELECT GATE
-  // ----------------------------------------------------------
-
   const gate =
     corridor === "MAS"
       ? CHENNAI_GATE
       : TIRUPATI_GATE;
-
-  // ----------------------------------------------------------
-  // DISTANCE
-  // ----------------------------------------------------------
 
   const distanceToGate =
     calculateDistanceKm(
@@ -1854,29 +1773,15 @@ async function processLiveCandidate(
     ) ||
     positionInfo.atGudur;
 
-  // ==========================================================
-  // IMPORTANT:
-  // A TRAIN FARTHER THAN THE WARNING DISTANCE MUST NOT BECOME
-  // THE ACTIVE GATE VEHICLE.
-  //
-  // It can still appear in the upcoming train list.
-  // ==========================================================
-
   const gateRelevant =
     distanceToGate <=
     WARNING_DISTANCE_KM;
-
-  // ----------------------------------------------------------
-  // WAIT / ETA
-  // ----------------------------------------------------------
 
   const boardEtaMinutes =
     candidate.etaMinutes;
 
   let waitMinutes = 0;
 
-  // OPEN/WARNING:
-  // show actual GDR arrival ETA.
   if (
     status === "OPEN" ||
     status === "WARNING"
@@ -1898,8 +1803,6 @@ async function processLiveCandidate(
     }
   }
 
-  // CLOSED:
-  // show approximate remaining gate wait.
   if (
     status === "CLOSED"
   ) {
@@ -1914,10 +1817,6 @@ async function processLiveCandidate(
         )
       );
   }
-
-  // ----------------------------------------------------------
-  // TRAIN STATUS
-  // ----------------------------------------------------------
 
   let trainStatus =
     "Approaching";
@@ -1934,10 +1833,6 @@ async function processLiveCandidate(
     trainStatus =
       "On Time";
   }
-
-  // ----------------------------------------------------------
-  // PAYLOAD
-  // ----------------------------------------------------------
 
   const payload = {
     status:
@@ -2040,6 +1935,166 @@ async function processLiveCandidate(
 }
 
 // ============================================================
+// PERSISTENT 15-MINUTE GATE HOLD
+// ============================================================
+//
+// GitHub Actions starts a fresh Node.js process on every run.
+// Therefore an in-memory timer would be lost between runs.
+//
+// We persist closedAtISO in Firebase instead.
+//
+// Behaviour:
+//
+// 1. First detection at <= 3 km -> CLOSED + closedAtISO = now.
+// 2. For the next 15 minutes -> remain CLOSED even if the next
+//    Actions run temporarily has no live GPS result.
+// 3. After 15 minutes -> OPEN if no current train is <= 3 km.
+// 4. If a train is still <= 3 km after the hold expires, a new
+//    15-minute hold starts from the fresh CLOSED detection.
+//
+// This is application display/control logic only, not railway-grade
+// fail-safe hardware control.
+// ============================================================
+
+function getPreviousGateHoldState(previousGate) {
+  if (
+    !previousGate ||
+    previousGate.status !== "CLOSED" ||
+    !previousGate.closedAtISO
+  ) {
+    return {
+      active: false,
+      expired: false,
+      closedAtISO: null,
+      remainingMinutes: 0
+    };
+  }
+
+  const closedAt =
+    new Date(
+      previousGate.closedAtISO
+    ).getTime();
+
+  if (!Number.isFinite(closedAt)) {
+    return {
+      active: false,
+      expired: false,
+      closedAtISO: null,
+      remainingMinutes: 0
+    };
+  }
+
+  const elapsedMs =
+    Date.now() - closedAt;
+
+  const remainingMs =
+    GATE_HOLD_MS - elapsedMs;
+
+  if (remainingMs > 0) {
+    return {
+      active: true,
+      expired: false,
+      closedAtISO:
+        previousGate.closedAtISO,
+      remainingMinutes:
+        Math.max(
+          1,
+          Math.ceil(
+            remainingMs / 60000
+          )
+        )
+    };
+  }
+
+  return {
+    active: false,
+    expired: true,
+    closedAtISO:
+      previousGate.closedAtISO,
+    remainingMinutes: 0
+  };
+}
+
+function applyPersistentGateHold(
+  gate,
+  previousGate,
+  gateName
+) {
+  const hold =
+    getPreviousGateHoldState(
+      previousGate
+    );
+
+  // ----------------------------------------------------------
+  // EXISTING 15-MINUTE HOLD IS STILL ACTIVE
+  // ----------------------------------------------------------
+
+  if (hold.active) {
+    gate.status = "CLOSED";
+
+    gate.closedAtISO =
+      hold.closedAtISO;
+
+    gate.holdMinutesRemaining =
+      hold.remainingMinutes;
+
+    gate.holdActive = true;
+
+    gate.waitMinutes =
+      hold.remainingMinutes;
+
+    console.log(
+      `[${gateName} HOLD] CLOSED | ${hold.remainingMinutes}m remaining`
+    );
+
+    return gate;
+  }
+
+  // ----------------------------------------------------------
+  // A NEW <= 3 KM DETECTION STARTS A NEW HOLD
+  // ----------------------------------------------------------
+
+  if (gate.status === "CLOSED") {
+    const closedAtISO =
+      hold.expired &&
+      hold.closedAtISO
+        ? new Date().toISOString()
+        : new Date().toISOString();
+
+    gate.closedAtISO =
+      closedAtISO;
+
+    gate.holdMinutesRemaining =
+      GATE_HOLD_MINUTES;
+
+    gate.holdActive = true;
+
+    gate.waitMinutes =
+      GATE_HOLD_MINUTES;
+
+    console.log(
+      `[${gateName} HOLD] NEW 15-MINUTE HOLD STARTED`
+    );
+
+    return gate;
+  }
+
+  // ----------------------------------------------------------
+  // HOLD EXPIRED AND NO TRAIN REQUIRES CLOSURE
+  // ----------------------------------------------------------
+
+  gate.closedAtISO = null;
+  gate.holdMinutesRemaining = 0;
+  gate.holdActive = false;
+
+  console.log(
+    `[${gateName} HOLD] OPEN - 15-minute hold complete`
+  );
+
+  return gate;
+}
+
+// ============================================================
 // UPDATE UPCOMING CORRIDOR FROM LIVE DATA
 // ============================================================
 
@@ -2077,6 +2132,20 @@ async function updateGateSystem() {
     Date.now();
 
   try {
+    // Read the previous Firebase gate state before processing this run.
+    // This is what makes the 15-minute CLOSED hold survive GitHub Actions runs.
+    const previousSnapshot =
+      await gateRef.once("value");
+
+    const previousData =
+      previousSnapshot.val() || {};
+
+    const previousChennaiGate =
+      previousData.chennaiGate || {};
+
+    const previousTirupatiGate =
+      previousData.tirupatiGate || {};
+
     console.log(
       "\n=========================================="
     );
@@ -2111,6 +2180,10 @@ async function updateGateSystem() {
 
     console.log(
       `Clear reference:  ${CLEAR_DISTANCE_KM} km`
+    );
+
+    console.log(
+      `Gate hold:        ${GATE_HOLD_MINUTES} minutes`
     );
 
     console.log(
@@ -2322,20 +2395,11 @@ async function updateGateSystem() {
         continue;
       }
 
-      // ------------------------------------------------------
-      // Upgrade display corridor
-      // ------------------------------------------------------
-
       updateUpcomingCorridor(
         upcomingList,
         candidate.trainNo,
         result.corridor
       );
-
-      // ------------------------------------------------------
-      // Ignore trains that are too far away for gate control.
-      // They remain visible in upcomingTrains.
-      // ------------------------------------------------------
 
       if (
         !result.gateRelevant
@@ -2417,6 +2481,24 @@ async function updateGateSystem() {
     }
 
     // ========================================================
+    // APPLY PERSISTENT 15-MINUTE HOLDS
+    // ========================================================
+
+    chennaiGate =
+      applyPersistentGateHold(
+        chennaiGate,
+        previousChennaiGate,
+        "CHENNAI GATE"
+      );
+
+    tirupatiGate =
+      applyPersistentGateHold(
+        tirupatiGate,
+        previousTirupatiGate,
+        "TIRUPATI GATE"
+      );
+
+    // ========================================================
     // FINAL FIREBASE UPDATE
     // ========================================================
 
@@ -2453,6 +2535,9 @@ async function updateGateSystem() {
           processingSeconds.toFixed(2)
         ),
 
+      gateHoldMinutes:
+        GATE_HOLD_MINUTES,
+
       meta: {
         timezone:
           "Asia/Kolkata",
@@ -2468,6 +2553,9 @@ async function updateGateSystem() {
 
         clearDistanceKm:
           CLEAR_DISTANCE_KM,
+
+        gateHoldMinutes:
+          GATE_HOLD_MINUTES,
 
         upcomingWindowHours:
           STATION_BOARD_HOURS,
@@ -2488,7 +2576,10 @@ async function updateGateSystem() {
           "TRAIN MUST BE BEFORE GDR ON LIVE ROUTE",
 
         gateRelevance:
-          "TRAIN MUST BE WITHIN 4 KM OF ITS GATE TO CONTROL THE GATE"
+          "TRAIN MUST BE WITHIN 4 KM OF ITS GATE TO CONTROL THE GATE",
+
+        holdLogic:
+          "GATE REMAINS CLOSED FOR 15 MINUTES AFTER FIRST CLOSED DETECTION"
       }
     });
 
@@ -2625,3 +2716,4 @@ updateGateSystem()
 
     process.exitCode = 1;
   });
+```
