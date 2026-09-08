@@ -67,10 +67,20 @@ const TIRUPATI_GATE = {
 // ============================================================
 // DISTANCE SETTINGS
 // ============================================================
+//
+// NEW SETTINGS:
+//
+// 4.00 km or less  -> WARNING
+// 3.00 km or less  -> CLOSED
+//
+// These values are used for the LIVE GPS gate decision.
+//
 
-const WARNING_DISTANCE_KM = 1.00;
+const WARNING_DISTANCE_KM = 4.00;
 
-const CLOSE_DISTANCE_KM = 0.60;
+const CLOSE_DISTANCE_KM = 3.00;
+
+// Keep this for Gudur-area / direction verification.
 
 const CLEAR_DISTANCE_KM = 0.80;
 
