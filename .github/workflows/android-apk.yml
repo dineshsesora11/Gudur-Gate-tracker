@@ -16,11 +16,12 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
+      - name: Install existing dependencies
         run: npm install
 
-      - name: Create web directory
+      - name: Prepare website
         run: |
+          rm -rf www
           mkdir -p www
           cp index.html www/index.html
 
@@ -29,13 +30,20 @@ jobs:
           npm install @capacitor/core @capacitor/cli @capacitor/android
 
       - name: Initialize Capacitor
-        run: npx cap init "GDR Crossing Radar" "com.gudurgate.tracker" --web-dir=www
+        run: |
+          npx cap init "GDR Crossing Radar" "com.gudurgate.tracker" --web-dir=www
 
-      - name: Add Android
-        run: npx cap add android
+      - name: Remove old Android platform
+        run: |
+          rm -rf android
+
+      - name: Add Android platform
+        run: |
+          npx cap add android
 
       - name: Sync Capacitor
-        run: npx cap sync android
+        run: |
+          npx cap sync android
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -43,7 +51,11 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Build APK
+      - name: Make Gradle executable
+        working-directory: android
+        run: chmod +x gradlew
+
+      - name: Build Debug APK
         working-directory: android
         run: ./gradlew assembleDebug
 
@@ -52,3 +64,4 @@ jobs:
         with:
           name: GDR-Crossing-Radar-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
