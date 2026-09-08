@@ -111,7 +111,7 @@ const CLOSE_DISTANCE_KM = 3.00;
 const CLEAR_DISTANCE_KM = 0.80;
 
 // Persistent gate hold.
-const GATE_HOLD_MINUTES = 15;
+const GATE_HOLD_MINUTES = 5;
 
 const GATE_HOLD_MS =
   GATE_HOLD_MINUTES *
