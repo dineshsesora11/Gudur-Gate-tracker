@@ -111,7 +111,7 @@ const CLEAR_DISTANCE_KM = 0.80;
 //
 // ============================================================
 
-const GATE_HOLD_MINUTES = 5;
+const GATE_HOLD_MINUTES = 13;
 
 const GATE_HOLD_MS =
   GATE_HOLD_MINUTES * 60 * 1000;
