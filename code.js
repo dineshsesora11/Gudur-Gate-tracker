@@ -122,8 +122,8 @@ const CLOSE_DISTANCE_KM = 3.00;
 
 const CLEAR_DISTANCE_KM = 0.80;
 
-// Keep gate closed for 15 minutes
-const GATE_HOLD_MINUTES = 15;
+// Keep gate closed for 8 minutes
+const GATE_HOLD_MINUTES = 8;
 
 const GATE_HOLD_MS =
   GATE_HOLD_MINUTES *
