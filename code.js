@@ -3,8 +3,6 @@
 // RailRadar + Firebase
 // ============================================================
 
-// GitHub Actions normally runs in UTC.
-// Force Node.js date/time calculations to IST.
 process.env.TZ = "Asia/Kolkata";
 
 const axios = require("axios");
@@ -26,8 +24,9 @@ if (!FIREBASE_SERVICE_ACCOUNT) {
 let serviceAccount;
 
 try {
-  serviceAccount =
-    JSON.parse(FIREBASE_SERVICE_ACCOUNT);
+  serviceAccount = JSON.parse(
+    FIREBASE_SERVICE_ACCOUNT
+  );
 } catch (error) {
   throw new Error(
     `FIREBASE_SERVICE_ACCOUNT is not valid JSON: ${error.message}`
@@ -35,15 +34,13 @@ try {
 }
 
 admin.initializeApp({
-  credential:
-    admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert(serviceAccount),
 
   databaseURL:
     "https://gudur-gate-tracker-default-rtdb.firebaseio.com"
 });
 
-const db =
-  admin.database();
+const db = admin.database();
 
 const gateRef =
   db.ref("gudur_gates");
@@ -64,7 +61,8 @@ if (!RAILRADAR_API_KEY) {
 const RAILRADAR_BASE_URL =
   "https://api.railradar.in/v1";
 
-const API_TIMEOUT_MS = 8000;
+// Increased from 8 seconds to 20 seconds
+const API_TIMEOUT_MS = 20000;
 
 // ============================================================
 // LOCATION
@@ -94,7 +92,7 @@ const TIRUPATI_GATE = {
 // > 1.00 km
 //     OPEN
 //
-// 0.51 km - 1.00 km
+// 0.51 - 1.00 km
 //     WARNING
 //
 // <= 0.50 km
@@ -106,29 +104,25 @@ const TIRUPATI_GATE = {
 // > 4.00 km
 //     OPEN
 //
-// 3.01 km - 4.00 km
+// 3.01 - 4.00 km
 //     WARNING
 //
 // <= 3.00 km
 //     CLOSED
 //
-// After CLOSED:
-//     Keep CLOSED for 15 minutes.
-//
 // ============================================================
 
-// North-side settings
+// North / Chennai side
 const NORTH_WARNING_DISTANCE_KM = 1.00;
 const NORTH_CLOSE_DISTANCE_KM = 0.50;
 
-// Existing Tirupati-side settings
+// Tirupati side
 const WARNING_DISTANCE_KM = 4.00;
 const CLOSE_DISTANCE_KM = 3.00;
 
-// Informational reference only.
 const CLEAR_DISTANCE_KM = 0.80;
 
-// Persistent gate hold.
+// Keep gate closed for 15 minutes
 const GATE_HOLD_MINUTES = 15;
 
 const GATE_HOLD_MS =
@@ -144,17 +138,14 @@ const STATION_BOARD_HOURS = 4;
 
 const MAX_UPCOMING_TRAINS = 10;
 
-// Only trains within this ETA receive live API checks.
 const LIVE_LOOKAHEAD_MINUTES = 90;
 
-// Maximum live train API requests.
 const MAX_LIVE_REQUESTS = 10;
 
-// Maximum static route API requests per run.
 const MAX_ROUTE_REQUESTS = 10;
 
 // ============================================================
-// RAILRADAR HTTP CONFIG
+// HTTP CONFIG
 // ============================================================
 
 function railRadarConfig() {
@@ -213,7 +204,8 @@ function getISTDateParts() {
 
   for (const part of parts) {
     if (
-      part.type !== "literal"
+      part.type !==
+      "literal"
     ) {
       result[part.type] =
         part.value;
@@ -310,7 +302,7 @@ function containsAny(
 }
 
 // ============================================================
-// VALUE HELPER
+// VALUE HELPERS
 // ============================================================
 
 function getNameOrCode(value) {
@@ -481,7 +473,6 @@ function parseTimeToMinutes(
     String(timeValue)
       .trim();
 
-  // HH:MM
   const simpleMatch =
     value.match(
       /^(\d{1,2}):(\d{2})$/
@@ -504,7 +495,6 @@ function parseTimeToMinutes(
     );
   }
 
-  // ISO / date
   const date =
     new Date(value);
 
@@ -584,7 +574,6 @@ function calculateTimeDifference(
     arrivalMinutes -
     currentMinutes;
 
-  // Midnight handling.
   if (
     diff < -720
   ) {
@@ -752,7 +741,6 @@ function calculateBoardEta(
   stop,
   item
 ) {
-  // If the board says the train is already at GDR.
   if (
     isAtStation(
       train,
@@ -776,7 +764,7 @@ function calculateBoardEta(
     );
 
   // ----------------------------------------------------------
-  // 1. SCHEDULED GDR ARRIVAL
+  // SCHEDULED GDR ARRIVAL
   // ----------------------------------------------------------
 
   const scheduledArrival =
@@ -821,7 +809,7 @@ function calculateBoardEta(
   }
 
   // ----------------------------------------------------------
-  // 2. LIVE EXPECTED ARRIVAL
+  // LIVE EXPECTED ARRIVAL
   // ----------------------------------------------------------
 
   const expectedArrival =
@@ -865,7 +853,7 @@ function calculateBoardEta(
   }
 
   // ----------------------------------------------------------
-  // 3. DIRECT ETA
+  // DIRECT ETA
   // ----------------------------------------------------------
 
   const directEta =
@@ -1567,7 +1555,7 @@ const MAS_STATIONS =
   ]);
 
 // ============================================================
-// DETERMINE CORRIDOR FROM ROUTE
+// DETERMINE CORRIDOR FROM ROUTE STOPS
 // ============================================================
 
 function determineCorridorFromRouteStops(
@@ -1695,7 +1683,7 @@ function determineCorridorFromLiveRoute(
     return null;
   }
 
-  // Must actually be inbound.
+  // Only inbound trains.
   if (
     positionInfo.inbound !==
     true
@@ -2170,28 +2158,14 @@ function findLiveCandidates(
 // ============================================================
 // GATE STATE
 // ============================================================
-//
-// MAS / NORTH:
-//
-// > 1.00 km       OPEN
-// 0.51-1.00 km    WARNING
-// <= 0.50 km      CLOSED
-//
-// TPTY / SOUTH:
-//
-// > 4.00 km       OPEN
-// 3.01-4.00 km    WARNING
-// <= 3.00 km      CLOSED
-//
-// ============================================================
 
 function getGateState(
   distanceKm,
   corridor
 ) {
-  // ----------------------------------------------------------
+  // ==========================================================
   // NORTH / CHENNAI SIDE
-  // ----------------------------------------------------------
+  // ==========================================================
 
   if (
     corridor ===
@@ -2214,9 +2188,9 @@ function getGateState(
     return "OPEN";
   }
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // SOUTH / TIRUPATI SIDE
-  // ----------------------------------------------------------
+  // ==========================================================
 
   if (
     distanceKm <=
@@ -2234,6 +2208,10 @@ function getGateState(
 
   return "OPEN";
 }
+
+// ============================================================
+// GATE PRIORITY
+// ============================================================
 
 function gatePriority(
   status
@@ -2675,15 +2653,17 @@ async function processLiveCandidate(
     positionInfo.atGudur;
 
   // ----------------------------------------------------------
-  // ONLY RELEVANT DISTANCE CONTROLS GATE
+  // CORRIDOR-SPECIFIC GATE ALERT DISTANCE
   // ----------------------------------------------------------
 
-  const gateRelevant =
+  const gateAlertDistanceKm =
     corridor === "MAS"
-      ? distanceToGate <=
-        NORTH_WARNING_DISTANCE_KM
-      : distanceToGate <=
-        WARNING_DISTANCE_KM;
+      ? NORTH_WARNING_DISTANCE_KM
+      : WARNING_DISTANCE_KM;
+
+  const gateRelevant =
+    distanceToGate <=
+    gateAlertDistanceKm;
 
   // ----------------------------------------------------------
   // ETA
@@ -2871,7 +2851,7 @@ async function processLiveCandidate(
 }
 
 // ============================================================
-// UPDATE UPCOMING CORRIDOR FROM LIVE DATA
+// UPDATE UPCOMING CORRIDOR
 // ============================================================
 
 function updateUpcomingCorridor(
@@ -2946,6 +2926,10 @@ async function updateGateSystem() {
 
     console.log(
       `Gate hold:               ${GATE_HOLD_MINUTES} minutes`
+    );
+
+    console.log(
+      `API timeout:             ${API_TIMEOUT_MS / 1000} seconds`
     );
 
     // ========================================================
@@ -3050,7 +3034,7 @@ async function updateGateSystem() {
       );
 
     // ========================================================
-    // FIX UPCOMING LINE CLASSIFICATION
+    // CLASSIFY ROUTES
     // ========================================================
 
     const corridorCache =
@@ -3059,7 +3043,7 @@ async function updateGateSystem() {
         previousCorridorCache
       );
 
-    // Rebuild using newly classified routes.
+    // Rebuild after classification.
     upcomingList =
       buildUpcomingFromBoard(
         trainsArray,
@@ -3108,7 +3092,7 @@ async function updateGateSystem() {
     );
 
     // ========================================================
-    // DEFAULT GATES
+    // DEFAULT CHENNAI GATE
     // ========================================================
 
     let chennaiGate = {
@@ -3130,6 +3114,10 @@ async function updateGateSystem() {
       corridor:
         "MAS"
     };
+
+    // ========================================================
+    // DEFAULT TIRUPATI GATE
+    // ========================================================
 
     let tirupatiGate = {
       status:
@@ -3161,7 +3149,7 @@ async function updateGateSystem() {
         MAX_LIVE_REQUESTS
       );
 
-    let liveRequestCount =
+    const liveRequestCount =
       candidatesToCheck.length;
 
     console.log(
@@ -3200,7 +3188,7 @@ async function updateGateSystem() {
         continue;
       }
 
-      // Upgrade upcoming display classification.
+      // Update upcoming classification.
       updateUpcomingCorridor(
         upcomingList,
         candidate.trainNo,
@@ -3309,7 +3297,7 @@ async function updateGateSystem() {
       );
 
     // ========================================================
-    // FINAL FIREBASE UPDATE
+    // PROCESSING TIME
     // ========================================================
 
     const processingSeconds =
@@ -3317,6 +3305,10 @@ async function updateGateSystem() {
         Date.now() -
         startedAt
       ) / 1000;
+
+    // ========================================================
+    // FIREBASE UPDATE
+    // ========================================================
 
     await gateRef.set({
       tirupatiGate,
@@ -3326,7 +3318,6 @@ async function updateGateSystem() {
       upcomingTrains:
         upcomingList,
 
-      // Cached train-number -> corridor.
       routeCorridorCache:
         corridorCache,
 
@@ -3361,14 +3352,14 @@ async function updateGateSystem() {
         timezoneLabel:
           "IST",
 
-        // North-side rules
+        // North / Chennai
         northWarningDistanceKm:
           NORTH_WARNING_DISTANCE_KM,
 
         northCloseDistanceKm:
           NORTH_CLOSE_DISTANCE_KM,
 
-        // Existing TPTY rules
+        // Tirupati
         warningDistanceKm:
           WARNING_DISTANCE_KM,
 
@@ -3380,6 +3371,10 @@ async function updateGateSystem() {
 
         gateHoldMinutes:
           GATE_HOLD_MINUTES,
+
+        apiTimeoutSeconds:
+          API_TIMEOUT_MS /
+          1000,
 
         upcomingWindowHours:
           STATION_BOARD_HOURS,
@@ -3420,7 +3415,7 @@ async function updateGateSystem() {
     });
 
     // ========================================================
-    // SUCCESS
+    // SUCCESS LOG
     // ========================================================
 
     console.log(
@@ -3480,6 +3475,15 @@ async function updateGateSystem() {
     );
 
     if (
+      error.code ===
+      "ECONNABORTED"
+    ) {
+      console.error(
+        `RailRadar request timed out after ${API_TIMEOUT_MS / 1000} seconds.`
+      );
+    }
+
+    if (
       error.response
     ) {
       console.error(
@@ -3509,90 +3513,8 @@ async function updateGateSystem() {
 }
 
 // ============================================================
-// START ONE RUN
+// START APPLICATION
 // ============================================================
-//
-// IMPORTANT:
-// No setInterval().
-// GitHub Actions runs this script according to the workflow.
-//
-// ============================================================
-
-console.log(
-  "=========================================="
-);
-
-console.log(
-  " Gudur Gate Monitor Starting "
-);
-
-console.log(
-  "=========================================="
-);
-
-console.log(
-  `Gudur: ${GUDUR.lat}, ${GUDUR.lng}`
-);
-
-console.log(
-  `Chennai Gate: ${CHENNAI_GATE.lat}, ${CHENNAI_GATE.lng}`
-);
-
-console.log(
-  `Tirupati Gate: ${TIRUPATI_GATE.lat}, ${TIRUPATI_GATE.lng}`
-);
-
-console.log(
-  "=========================================="
-);
-
-console.log(
-  "NORTH / CHENNAI GATE:"
-);
-
-console.log(
-  " > 1.00 km = OPEN"
-);
-
-console.log(
-  " 0.51-1.00 km = WARNING"
-);
-
-console.log(
-  " <= 0.50 km = CLOSED"
-);
-
-console.log(
-  "=========================================="
-);
-
-console.log(
-  "TIRUPATI GATE:"
-);
-
-console.log(
-  " > 4.00 km = OPEN"
-);
-
-console.log(
-  " 3.01-4.00 km = WARNING"
-);
-
-console.log(
-  " <= 3.00 km = CLOSED"
-);
-
-console.log(
-  "=========================================="
-);
-
-console.log(
-  `Gate hold: ${GATE_HOLD_MINUTES} minutes`
-);
-
-console.log(
-  "=========================================="
-);
 
 updateGateSystem()
   .then(
