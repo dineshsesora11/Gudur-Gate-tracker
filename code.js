@@ -89,6 +89,20 @@ const TIRUPATI_GATE = {
 // GATE RULES
 // ============================================================
 //
+// NORTH / CHENNAI SIDE:
+//
+// > 1.00 km
+//     OPEN
+//
+// 0.51 km - 1.00 km
+//     WARNING
+//
+// <= 0.50 km
+//     CLOSED
+//
+//
+// SOUTH / TIRUPATI SIDE:
+//
 // > 4.00 km
 //     OPEN
 //
@@ -103,15 +117,19 @@ const TIRUPATI_GATE = {
 //
 // ============================================================
 
-const WARNING_DISTANCE_KM = 4.00;
+// North-side settings
+const NORTH_WARNING_DISTANCE_KM = 1.00;
+const NORTH_CLOSE_DISTANCE_KM = 0.50;
 
+// Existing Tirupati-side settings
+const WARNING_DISTANCE_KM = 4.00;
 const CLOSE_DISTANCE_KM = 3.00;
 
 // Informational reference only.
 const CLEAR_DISTANCE_KM = 0.80;
 
 // Persistent gate hold.
-const GATE_HOLD_MINUTES = 5;
+const GATE_HOLD_MINUTES = 15;
 
 const GATE_HOLD_MS =
   GATE_HOLD_MINUTES *
@@ -990,13 +1008,6 @@ async function fetchLiveTrain(
 // ============================================================
 // RAILRADAR STATIC TRAIN ROUTE
 // ============================================================
-//
-// Used for upcoming-list corridor classification.
-//
-// Official RailRadar route API:
-// /v1/trains/{number}/route?format=geojson&stops=true
-//
-// ============================================================
 
 async function fetchTrainRoute(
   trainNo
@@ -1462,11 +1473,8 @@ function getLiveTrainPosition(
     if (!coordinates) {
       const nextIndex =
         Math.min(
-          currentIndex +
-            1,
-
-          route.length -
-            1
+          currentIndex + 1,
+          route.length - 1
         );
 
       coordinates =
@@ -1560,18 +1568,6 @@ const MAS_STATIONS =
 
 // ============================================================
 // DETERMINE CORRIDOR FROM ROUTE
-// ============================================================
-//
-// The train's origin is NOT used as the primary classification.
-//
-// Example:
-//
-// 13433 SMVT Bengaluru
-// Bengaluru -> ... -> Renigunta -> GDR
-//
-// This must be TPTY side.
-//
-// Therefore we look at the station immediately before GDR.
 // ============================================================
 
 function determineCorridorFromRouteStops(
@@ -1714,10 +1710,6 @@ function determineCorridorFromLiveRoute(
 
 // ============================================================
 // ORIGIN FALLBACK
-// ============================================================
-//
-// ONLY for temporary display before route classification.
-// Gate control NEVER uses this.
 // ============================================================
 
 function determineBoardDisplayCorridorFallback(
@@ -1952,12 +1944,6 @@ function buildUpcomingFromBoard(
 // ============================================================
 // ENRICH UPCOMING CORRIDORS
 // ============================================================
-//
-// Fetch static routes only for train numbers that are not already
-// cached as MAS/TPTY.
-//
-// The route result is saved in Firebase.
-// ============================================================
 
 async function enrichUpcomingCorridors(
   upcomingList,
@@ -2184,11 +2170,54 @@ function findLiveCandidates(
 // ============================================================
 // GATE STATE
 // ============================================================
+//
+// MAS / NORTH:
+//
+// > 1.00 km       OPEN
+// 0.51-1.00 km    WARNING
+// <= 0.50 km      CLOSED
+//
+// TPTY / SOUTH:
+//
+// > 4.00 km       OPEN
+// 3.01-4.00 km    WARNING
+// <= 3.00 km      CLOSED
+//
+// ============================================================
 
 function getGateState(
-  distanceKm
+  distanceKm,
+  corridor
 ) {
-  // <= 3.00 km
+  // ----------------------------------------------------------
+  // NORTH / CHENNAI SIDE
+  // ----------------------------------------------------------
+
+  if (
+    corridor ===
+    "MAS"
+  ) {
+    if (
+      distanceKm <=
+      NORTH_CLOSE_DISTANCE_KM
+    ) {
+      return "CLOSED";
+    }
+
+    if (
+      distanceKm <=
+      NORTH_WARNING_DISTANCE_KM
+    ) {
+      return "WARNING";
+    }
+
+    return "OPEN";
+  }
+
+  // ----------------------------------------------------------
+  // SOUTH / TIRUPATI SIDE
+  // ----------------------------------------------------------
+
   if (
     distanceKm <=
     CLOSE_DISTANCE_KM
@@ -2196,7 +2225,6 @@ function getGateState(
     return "CLOSED";
   }
 
-  // > 3.00 and <= 4.00
   if (
     distanceKm <=
     WARNING_DISTANCE_KM
@@ -2204,7 +2232,6 @@ function getGateState(
     return "WARNING";
   }
 
-  // > 4.00
   return "OPEN";
 }
 
@@ -2351,7 +2378,7 @@ function getPreviousGateHoldState(
 }
 
 // ============================================================
-// APPLY PERSISTENT 15-MINUTE HOLD
+// APPLY PERSISTENT GATE HOLD
 // ============================================================
 
 function applyPersistentGateHold(
@@ -2611,7 +2638,8 @@ async function processLiveCandidate(
 
   const status =
     getGateState(
-      distanceToGate
+      distanceToGate,
+      corridor
     );
 
   const trainName =
@@ -2647,12 +2675,15 @@ async function processLiveCandidate(
     positionInfo.atGudur;
 
   // ----------------------------------------------------------
-  // ONLY <= 4 KM CONTROLS GATE
+  // ONLY RELEVANT DISTANCE CONTROLS GATE
   // ----------------------------------------------------------
 
   const gateRelevant =
-    distanceToGate <=
-    WARNING_DISTANCE_KM;
+    corridor === "MAS"
+      ? distanceToGate <=
+        NORTH_WARNING_DISTANCE_KM
+      : distanceToGate <=
+        WARNING_DISTANCE_KM;
 
   // ----------------------------------------------------------
   // ETA
@@ -2898,15 +2929,23 @@ async function updateGateSystem() {
     );
 
     console.log(
-      `Warning distance: ${WARNING_DISTANCE_KM} km`
+      `North warning distance: ${NORTH_WARNING_DISTANCE_KM} km`
     );
 
     console.log(
-      `Close distance:   ${CLOSE_DISTANCE_KM} km`
+      `North close distance:   ${NORTH_CLOSE_DISTANCE_KM} km`
     );
 
     console.log(
-      `Gate hold:        ${GATE_HOLD_MINUTES} minutes`
+      `TPTY warning distance:   ${WARNING_DISTANCE_KM} km`
+    );
+
+    console.log(
+      `TPTY close distance:     ${CLOSE_DISTANCE_KM} km`
+    );
+
+    console.log(
+      `Gate hold:               ${GATE_HOLD_MINUTES} minutes`
     );
 
     // ========================================================
@@ -3322,6 +3361,14 @@ async function updateGateSystem() {
         timezoneLabel:
           "IST",
 
+        // North-side rules
+        northWarningDistanceKm:
+          NORTH_WARNING_DISTANCE_KM,
+
+        northCloseDistanceKm:
+          NORTH_CLOSE_DISTANCE_KM,
+
+        // Existing TPTY rules
         warningDistanceKm:
           WARNING_DISTANCE_KM,
 
@@ -3346,6 +3393,9 @@ async function updateGateSystem() {
         maxLiveRequests:
           MAX_LIVE_REQUESTS,
 
+        maxRouteRequests:
+          MAX_ROUTE_REQUESTS,
+
         source:
           "RailRadar GDR live station board + train route geometry + live train telemetry",
 
@@ -3359,7 +3409,13 @@ async function updateGateSystem() {
           "TRAIN MUST BE BEFORE GDR ON LIVE ROUTE",
 
         gateRelevance:
-          "TRAIN MUST BE WITHIN 4 KM OF ITS GATE TO CONTROL THE GATE"
+          "MAS trains must be within 1 km of Chennai Gate; TPTY trains must be within 4 km of Tirupati Gate",
+
+        northGateLogic:
+          ">1.00 km OPEN, 0.51-1.00 km WARNING, <=0.50 km CLOSED",
+
+        tirupatiGateLogic:
+          ">4.00 km OPEN, 3.01-4.00 km WARNING, <=3.00 km CLOSED"
       }
     });
 
@@ -3459,6 +3515,7 @@ async function updateGateSystem() {
 // IMPORTANT:
 // No setInterval().
 // GitHub Actions runs this script according to the workflow.
+//
 // ============================================================
 
 console.log(
@@ -3483,6 +3540,54 @@ console.log(
 
 console.log(
   `Tirupati Gate: ${TIRUPATI_GATE.lat}, ${TIRUPATI_GATE.lng}`
+);
+
+console.log(
+  "=========================================="
+);
+
+console.log(
+  "NORTH / CHENNAI GATE:"
+);
+
+console.log(
+  " > 1.00 km = OPEN"
+);
+
+console.log(
+  " 0.51-1.00 km = WARNING"
+);
+
+console.log(
+  " <= 0.50 km = CLOSED"
+);
+
+console.log(
+  "=========================================="
+);
+
+console.log(
+  "TIRUPATI GATE:"
+);
+
+console.log(
+  " > 4.00 km = OPEN"
+);
+
+console.log(
+  " 3.01-4.00 km = WARNING"
+);
+
+console.log(
+  " <= 3.00 km = CLOSED"
+);
+
+console.log(
+  "=========================================="
+);
+
+console.log(
+  `Gate hold: ${GATE_HOLD_MINUTES} minutes`
 );
 
 console.log(
